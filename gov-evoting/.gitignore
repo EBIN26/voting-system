@@ -1,0 +1,13 @@
+node_modules
+artifacts
+cache
+data
+.env
+.env.*
+!.env.example
+ceremony/*.share.json
+tally.json
+published-*.pem
+frontend/public/app.js
+frontend/public/admin.js
+frontend/public/simple.js

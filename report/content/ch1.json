@@ -1,0 +1,30 @@
+[
+  {"t": "h1", "num": "1", "title": "INTRODUCTION"},
+  {"t": "p", "text": "Voting is the mechanism through which a democracy turns the wishes of its citizens into decisions. Its value depends entirely on trust: voters must believe that only eligible people voted, that each person voted once, that their choice stayed secret and that the final count is honest. Paper ballots earn this trust through physical procedures, such as sealed boxes, polling agents and counting under observation, but they are slow, expensive to run and open to local tampering. Electronic voting promises speed and convenience, yet a poorly designed system asks citizens to trust a machine or a server that they cannot inspect."},
+  {"t": "p", "text": "Blockchain technology offers a different basis for trust. A blockchain is a shared, append-only record that is kept by many independent computers, so no single party can quietly change what has been written. A smart contract is a program stored on such a chain that runs exactly as written and whose rules everyone can read. If the rules of an election are placed in a smart contract and the ballots are recorded on the chain, the integrity of the process no longer rests on the honesty of one administrator."},
+  {"t": "p", "text": "A blockchain, however, is public and permanent. Writing a plain vote on it would destroy the secrecy of the ballot for ever. The challenge of this project is therefore to combine the tamper-resistance of a blockchain with strong cryptography that keeps each vote secret until the election is over, and that makes it impossible to connect a ballot to the person who cast it. This report describes the design, construction and testing of a prototype that does so."},
+  {"t": "h2", "text": "1.1 Research Gap"},
+  {"t": "p", "text": "A review of existing blockchain voting proposals and of our own earlier prototype shows a recurring set of weaknesses:"},
+  {"t": "ul", "items": [
+    "**Identity and ballot are linked.** Many prototypes record the voter's account address next to the vote on the chain. Anyone who learns that address can read the vote, and the secrecy of the ballot is lost.",
+    "**Votes are stored in the clear, or one key holder can decrypt them.** Systems that do encrypt ballots often leave the decryption key with a single administrator, who becomes a single point of trust and of failure.",
+    "**Identity is taken on trust.** Prototypes frequently accept a typed voter number, with no real proof that the person is the registered voter.",
+    "**Rules are enforced by the server, not by the chain.** If limits such as one vote per voter or the closing time are checked only by a web server, a compromised server can break them, and observers cannot tell.",
+    "**The count cannot be checked by outsiders.** Results are announced, but ordinary citizens cannot recount them themselves.",
+    "**Little evidence of testing.** Prototypes rarely report automated tests, measured cost or measured speed, so their claims cannot be judged."
+  ]},
+  {"t": "p", "text": "The gap, therefore, is a working system that joins identity verification, ballot secrecy, shared control of the decryption key, rules enforced by the blockchain itself, and a publicly verifiable count, and that supports each claim with tests and measurements."},
+  {"t": "h2", "text": "1.2 Problem Statement"},
+  {"t": "p", "text": "To design and implement a prototype electronic voting system in which (a) only voters on the electoral roll can vote, and only once; (b) no person or system, including the administrators and the server operators, can discover how an individual voted; (c) no single person can decrypt the ballots or alter the result; (d) the rules of the election are enforced by a smart contract and cannot be bypassed by the web server; and (e) any member of the public can independently verify the final count."},
+  {"t": "h2", "text": "1.3 Complex Engineering Problem"},
+  {"t": "p", "text": "The problem has the characteristics of a complex engineering problem, as defined by the Washington Accord attributes WP1 to WP7. Table 1.1 shows how each attribute applies to this project."},
+  {"t": "table", "caption": "Table 1.1: Complex engineering problem attributes", "widths": [1.6, 4.2, 9.8], "header": ["Code", "Attribute", "How it applies to this project"], "boldFirstCol": true, "rows": [
+    ["WP1", "Depth of knowledge", "Needs public-key and symmetric cryptography, hash functions, secret sharing, blockchain and smart contracts, web security and database design."],
+    ["WP2", "Conflicting requirements", "Verifiability against secrecy; transparency of a public chain against privacy of the voter; convenience against security; low cost against strong guarantees."],
+    ["WP3", "Depth of analysis", "Required reasoning about attacks such as double voting, vote selling, replay of a ballot in another election, and a malicious server or trustee. No standard solution fits the whole problem."],
+    ["WP4", "Familiarity of issues", "Anonymous electronic voting is a hard open problem, not a routine task."],
+    ["WP5", "Extent of applicable codes", "Must follow cryptographic standards (NIST, RFC) and consider Indian law such as the Aadhaar Act and the DPDP Act."],
+    ["WP6", "Extent of stakeholder involvement", "Voters, election administrators, trustees, auditors and the public all have different, sometimes opposed, interests."],
+    ["WP7", "Interdependence", "Browser, backend, database, blockchain and trustee tools depend on each other; a weakness in one affects the others."]
+  ]}
+]

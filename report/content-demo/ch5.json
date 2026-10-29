@@ -1,0 +1,78 @@
+[
+  {"t": "h1", "num": "5", "title": "RESULT AND DISCUSSION"},
+  {"t": "h2", "text": "5.1 Results"},
+  {"t": "h3", "text": "5.1.1 What happens when the Vote button is pressed"},
+  {"t": "p", "text": "The voter sees a single page with a list of dummy voter IDs and a Vote button for each candidate (Figure 5.1). Pressing a button starts the five backend steps of Figure 3.2. The page then shows what each step did and how long it took (Figure 5.2). The receipt at the bottom gives the confirmation code, the transaction hash and the block in which the ballot was recorded."},
+  {"t": "fig", "file": "img/fig51_votepage.jpg", "width": 12.0, "caption": "Figure 5.1: One-click voting page"},
+  {"t": "fig", "file": "img/fig52_pipeline.jpg", "width": 12.0, "caption": "Figure 5.2: What the backend did for one vote"},
+  {"t": "table", "caption": "Table 5.1: Time taken by each step of one vote (local test chain; Sepolia timing in the text below)", "widths": [8.0, 4.0, 3.6], "header": ["Step", "Time (ms)", "Share"], "rows": [
+    ["1. Check the request and the election", "29", "13 %"],
+    ["2. Verify the voter", "14", "6 %"],
+    ["3. Issue the single-use token", "11", "5 %"],
+    ["4. Encrypt the ballot", "3", "1 %"],
+    ["5. Record on the blockchain", "168", "75 %"],
+    ["Total", "about 225", "100 %"]
+  ]},
+  {"t": "p", "text": "The whole vote takes about 0.23 seconds on the local chain, of which three quarters is the blockchain step. Encryption is almost free. On Sepolia the blockchain step took 7.2, 14.1 and 7.2 seconds in the three live votes timed, because a transaction has to be included in a real block; the other four steps stayed under 0.3 seconds in total. The backend allows up to 150 seconds for confirmation."},
+  {"t": "h3", "text": "5.1.2 Refused votes"},
+  {"t": "p", "text": "The demonstration deliberately includes votes that must fail. A voter who presses Vote a second time is stopped at step 3 with the message that the voter has already voted, and nothing reaches the blockchain. The fifth dummy voter, who is not on the electoral roll, is stopped at step 2 because the voter hash is not found. A vote attempted before the election opens is stopped at step 1. In each case the page shows which step failed and why, and the ballot count does not change."},
+  {"t": "h3", "text": "5.1.3 Cost of a vote"},
+  {"t": "p", "text": "On the local test chain, four test ballots used 417,397, 417,409, 417,349 and 417,385 gas, that is about 417,000 gas per vote. On the Sepolia network the same contract used about 1,808,400 gas per ballot (1,808,405 and 1,808,393 in the receipts, and 1,808,393 calculated from the Etherscan fee of 0.000000000028934288 ETH at a gas price of 16 wei). The values are almost the same from ballot to ballot because all ballots have the same size. The reason for the difference between the two chains was not investigated; the numbers are reported as measured."},
+  {"t": "p", "text": "The cost in money depends on the gas price of the network at the time of the vote. On Sepolia the price was 16 wei, so a ballot cost about 0.00000000003 ETH, and test ether is free in any case. On a real network the gas used and the gas price would both decide the cost, so the figure must be measured again before any real use."},
+  {"t": "h3", "text": "5.1.4 A complete election"},
+  {"t": "p", "text": "On the local test chain, a demonstration election was run with four voters on the roll and three candidates (the live election on Sepolia is described in Section 5.1.5). The administrator page shows the turnout and a set of consistency checks (Figure 5.3). After voting closed, two trustees agreed on the totals and the contract finalised the result (Figure 5.4). The result was Ann 1, Ben 1 and Cat 2, a turnout of 4 of 4. The repeated vote and the voter who was not on the roll were refused as described above."},
+  {"t": "fig", "file": "img/fig53_admin_turnout.jpg", "width": 14.0, "caption": "Figure 5.3: Administrator page, turnout and consistency checks"},
+  {"t": "fig", "file": "img/fig54_admin_results.jpg", "width": 14.0, "caption": "Figure 5.4: Administrator page, trustee agreement and final results"},
+  {"t": "h3", "text": "5.1.5 Live election on the cloud server and Sepolia"},
+  {"t": "p", "text": "The deployment of Section 3.4.9 was carried out and a complete election was run on it. The steps and what each produced are listed below."},
+  {"t": "steps", "items": [
+    "**Wallets and funding.** Five wallets were created (administrator, submitter, three trustees) and funded with Sepolia test ether from faucets.",
+    "**Key ceremony and deployment.** The election key was generated and split into three shares. The GovElection contract was deployed to Sepolia (chain id 11155111) from the administrator wallet at address 0x1239211934D7a115A3DA5955aDEA0f5005f59877, in block 12010825.",
+    "**Bundle and server.** The deployment bundle was built, with its automatic check that no wallet or trustee share is inside, and copied to the Oracle Cloud virtual machine. Docker built the image in about 144 seconds and started the backend and Caddy. The site was reached over HTTPS at e-voting-system.duckdns.org.",
+    "**Opening.** The administrator opened the election for 4 voters with a 30-minute window (transaction in block 12010944).",
+    "**Voting.** Four ballots were recorded in blocks 12010955, 12010963, 12010965 and 12010967, all sent from the submitter wallet to the contract. The blockchain step took between 7 and 14 seconds, and the other four steps together under 0.5 seconds. A repeated vote was refused at step 3 and an off-roll voter at step 2.",
+    "**Closing.** The contract refused to close before the window ended, as designed, and the election was closed afterwards.",
+    "**Counting.** Two trustees rebuilt the key and decrypted the four ballots: 4 ballots, 0 invalid, Ann 2, Ben 1 and Cat 1. Each trustee submitted the same tally from their own wallet. After the second submission the contract moved to Finalized with the results 2, 1 and 1.",
+    "**Public recount.** The published key was used with the verify-tally tool, which downloaded the ballots from the chain, decrypted them and reported that the count matches the official results."
+  ]},
+  {"t": "p", "text": "The Etherscan page of the contract lists five transactions: one openElection call from the administrator and four castBallot calls from the submitter. This public record is the evidence that the election ran on a real public network and not only on the developer's computer."},
+  {"t": "p", "text": "Figure 5.5 shows a vote on the live site, with the five steps and their times. Figures 5.6 and 5.7 show the two refusals: a voter who has already voted is stopped at step 3, and a voter who is not on the electoral roll is stopped at step 2. In both cases the later steps are not run and nothing reaches the blockchain."},
+  {"t": "fig", "file": "img/live/live-2-vote-ok.png", "width": 11.0, "caption": "Figure 5.5: A vote recorded on the live site (Sepolia)"},
+  {"t": "fig", "file": "img/live/live-3-refused-twice.png", "width": 10.0, "caption": "Figure 5.6: A repeated vote is refused at step 3"},
+  {"t": "fig", "file": "img/live/live-4-refused-roll.png", "width": 10.0, "caption": "Figure 5.7: A voter who is not on the roll is refused at step 2"},
+  {"t": "p", "text": "Figure 5.8 is the Etherscan page of the contract, listing the opening transaction and the four ballot transactions. Figure 5.9 is the page of one ballot transaction: it succeeded, it was sent by the submitter wallet to the contract, it carried no ether, and the fee was about 0.00000000003 ETH at a gas price of 16 wei."},
+  {"t": "fig", "file": "img/live/live-5-etherscan-contract.png", "width": 15.4, "caption": "Figure 5.8: The contract on Etherscan (Sepolia) with its five transactions"},
+  {"t": "fig", "file": "img/live/live-6-etherscan-tx.png", "width": 15.4, "caption": "Figure 5.9: One ballot transaction on Etherscan"},
+  {"t": "p", "text": "Figure 5.10 shows the trustees' count after decryption, and Figure 5.11 shows the two trustee submissions, the finalised result and the public recount that matches the official result."},
+  {"t": "fig", "file": "img/live/live-7-tally.png", "width": 15.4, "caption": "Figure 5.10: The count after decrypting the four ballots"},
+  {"t": "fig", "file": "img/live/live-8-verify.png", "width": 15.4, "caption": "Figure 5.11: Trustee submissions, finalised result and public recount"},
+  {"t": "h3", "text": "5.1.6 Testing"},
+  {"t": "table", "caption": "Table 5.2: Automated tests", "widths": [4.4, 2.2, 9.0], "header": ["Group", "Tests", "What is checked"], "boldFirstCol": true, "rows": [
+    ["Smart contract", "20", "Phases move only forward; one ballot per token; ballot size limit; voter limit; only the submitter can cast; early closing refused; tally needs two matching trustees; key ceremony shares and key hash"],
+    ["Backend and cryptography", "75", "Voter hash; single-use token; rate limits; ballot encryption and decryption; tampered ballots rejected; one-button mode and its refusals; cache behaviour"],
+    ["Deployment tooling", "12", "Wallet creation, deployment with the correct accounts, configuration files and the cloud bundle"],
+    ["Total", "107", "All passed"]
+  ]},
+  {"t": "h3", "text": "5.1.7 What the demonstration proves, and what it does not"},
+  {"t": "ul", "items": [
+    "**It proves** that the backend pipeline works end to end: a vote is verified, tokenised, encrypted and recorded on a blockchain in about a quarter of a second; double voting and off-roll voting are refused; the trustees can decrypt together and anyone can verify the count.",
+    "**It does not prove** that the real voter is who they claim to be, because the demo uses dummy voter IDs with no identity check.",
+    "**It does not hide the vote from the demo server**, because the server encrypts the ballot itself in this mode.",
+    "**It does not show how the system behaves under load or on a main network**: the live run used four voters on a test network with free test ether."
+  ]},
+  {"t": "h2", "text": "5.2 Impact on Society"},
+  {"t": "ul", "items": [
+    "**Trust in elections.** Because the rules sit in a public contract and the count can be rechecked by anyone, doubt about the result can be settled with evidence instead of argument.",
+    "**Inclusion.** A secure remote option could help voters who cannot reach a polling booth, such as migrants, the elderly and people with disabilities.",
+    "**Privacy.** The design collects no more than it needs; raw identity numbers are not kept, and the database holds no link between a voter and a ballot.",
+    "**Cost and environment.** Less printing, transport and manpower is needed than for paper elections in small and medium bodies.",
+    "**Cautions.** Online voting can create risks of coercion and vote selling outside the polling booth, and not everyone has a device or internet access. These issues must be addressed before any real public use (Section 6.2)."
+  ]},
+  {"t": "h2", "text": "5.3 SDG Mapping"},
+  {"t": "table", "caption": "Table 5.3: Mapping to the United Nations Sustainable Development Goals [22]", "widths": [3.6, 12.0], "header": ["SDG", "Contribution of the project"], "boldFirstCol": true, "rows": [
+    ["SDG 16: Peace, Justice and Strong Institutions", "Targets 16.6 and 16.7: more transparent and accountable institutions and inclusive decision-making through a verifiable, tamper-evident vote."],
+    ["SDG 9: Industry, Innovation and Infrastructure", "Targets 9.c and 9.5: applies modern information technology and research to a public-service problem."],
+    ["SDG 10: Reduced Inequalities", "Target 10.2: a remote voting option can include people who find it hard to reach a polling booth."],
+    ["SDG 17: Partnerships for the Goals", "Open, standard tools and a public verification tool allow others to check and reuse the work."]
+  ]}
+]

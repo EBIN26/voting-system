@@ -1,0 +1,11 @@
+{
+  "contract": "0x1239211934D7a115A3DA5955aDEA0f5005f59877",
+  "tally": [
+    2,
+    1,
+    1
+  ],
+  "invalid": 0,
+  "ballots": 4,
+  "tallyHash": "0x84b2ad7ce32cbbb8be1a64d37ecf49d81bbf742d6de0889dd6b2e0cc63d38730"
+}

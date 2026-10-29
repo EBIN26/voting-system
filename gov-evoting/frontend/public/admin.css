@@ -1,0 +1,30 @@
+.wide { max-width: 860px; }
+h3 { font-size: 1rem; margin: 16px 0 6px; }
+.turnout { font-size: 1.6rem; font-weight: 700; margin: 0 0 8px; }
+.turnout .muted { font-size: .95rem; font-weight: 400; }
+table.funnel { width: 100%; border-collapse: collapse; margin: 8px 0 12px; }
+.funnel th, .funnel td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); font-weight: 400; }
+.funnel thead th { color: var(--muted); font-size: .85rem; font-weight: 600; }
+.funnel tbody th { font-weight: 600; }
+.funnel .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.checks { list-style: none; padding: 0; margin: 8px 0 12px; }
+.checks li { display: flex; gap: 10px; padding: 6px 0; align-items: flex-start; }
+.checks .mark { flex: none; width: 1.4em; text-align: center; font-weight: 700; }
+.checks .ok .mark { color: var(--ok); }
+.checks .bad .mark { color: var(--err); }
+.checks .wait .mark { color: var(--muted); }
+.checks .warn .mark { color: var(--warn); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-top: 12px; }
+.summary { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; margin: 12px 0 4px; min-height: 2.6em; }
+.confirm { border: 2px solid var(--warn); border-radius: 10px; padding: 12px 14px; margin-top: 14px; }
+
+.facts { margin: 0; display: grid; gap: 10px; }
+.facts div { display: grid; grid-template-columns: minmax(130px, 200px) 1fr; gap: 10px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; word-break: break-all; }
+@media (max-width: 520px) { .facts div { grid-template-columns: 1fr; gap: 0; } }
+
+input[type="datetime-local"], input[type="password"] { letter-spacing: 0; }
+.mono { font-family: ui-monospace, Consolas, monospace; font-size: .85rem; }

@@ -1,0 +1,46 @@
+[
+  {"t": "h1", "num": "5", "title": "RESULT AND DISCUSSION"},
+  {"t": "h2", "text": "5.1 Results"},
+  {"t": "h3", "text": "5.1.1 The voting page and the backend pipeline"},
+  {"t": "p", "text": "The voter sees a single page with the candidates and a Vote button (Figure 5.1). When the button is pressed, the backend carries out five steps: it checks the election state, verifies the voter, issues the one-time token, encrypts the ballot, and records it on the blockchain. Figure 5.2 shows the page after one vote, with the time taken by each step."},
+  {"t": "fig", "file": "img/fig51_votepage.jpg", "width": 12.0, "caption": "Figure 5.1: One-click voting page"},
+  {"t": "fig", "file": "img/fig52_pipeline.jpg", "width": 12.0, "caption": "Figure 5.2: What the backend did for one vote"},
+  {"t": "table", "caption": "Table 5.1: Time taken by each step of one vote (local test chain)", "widths": [8.0, 4.0, 3.6], "header": ["Step", "Time (ms)", "Share"], "rows": [
+    ["1. Check the election state", "29", "13 %"],
+    ["2. Verify the voter", "14", "6 %"],
+    ["3. Issue the single-use token", "11", "5 %"],
+    ["4. Encrypt the ballot", "3", "1 %"],
+    ["5. Record on the blockchain", "168", "75 %"],
+    ["Total", "about 225", "100 %"]
+  ]},
+  {"t": "p", "text": "The whole vote takes about 0.23 seconds, of which three quarters is the blockchain step. Encryption is almost free, at about 3 milliseconds. On a public network the blockchain step will take longer, because the transaction has to be included in a block."},
+  {"t": "h3", "text": "5.1.2 Cost of a vote"},
+  {"t": "p", "text": "Four test ballots used 417,397, 417,409, 417,349 and 417,385 gas, that is about 417,000 gas per vote. The values are almost the same for every ballot because all ballots have the same size. Most of this cost is the storage of the 430-byte ballot on the chain. The cost in money depends on the gas price of the network at the time of the vote."},
+  {"t": "h3", "text": "5.1.3 A complete election"},
+  {"t": "p", "text": "A demonstration election was run with four registered voters and three candidates. The administrator page shows the turnout and a set of consistency checks (Figure 5.3). After voting closed, two trustees agreed on the totals and the contract finalised the result (Figure 5.4). The result was Ann 1, Ben 1 and Cat 2, a turnout of 4 of 4. An attempt to vote a second time was refused, and so was an attempt by a person who was not on the roll."},
+  {"t": "fig", "file": "img/fig53_admin_turnout.jpg", "width": 14.0, "caption": "Figure 5.3: Administrator page, turnout and consistency checks"},
+  {"t": "fig", "file": "img/fig54_admin_results.jpg", "width": 14.0, "caption": "Figure 5.4: Administrator page, trustee agreement and final results"},
+  {"t": "p", "text": "The complete deployment path was also rehearsed on a local chain with separate wallets for the administrator, the backend and the trustees. It produced the expected result, and the file prepared for the cloud server was checked to make sure it contains no wallet key and no trustee share."},
+  {"t": "h3", "text": "5.1.4 Testing"},
+  {"t": "table", "caption": "Table 5.2: Automated tests", "widths": [4.4, 2.2, 9.0], "header": ["Group", "Tests", "What is checked"], "boldFirstCol": true, "rows": [
+    ["Smart contract", "20", "Phases move only forward; one ballot per token; ballot size limit; voter limit; only the submitter can cast; early closing refused; tally needs two matching trustees; key ceremony shares and key hash"],
+    ["Backend and cryptography", "75", "OTP expiry and attempt limits; sessions; voter hash; single-use token; rate limits; ballot encryption and decryption; tampered ballots rejected; one-button mode; cache behaviour"],
+    ["Deployment tooling", "12", "Wallet creation, deployment with the correct accounts, configuration files and the cloud bundle"],
+    ["Total", "107", "All passed"]
+  ]},
+  {"t": "h2", "text": "5.2 Impact on Society"},
+  {"t": "ul", "items": [
+    "**Trust in elections.** Because the rules sit in a public contract and the count can be rechecked by anyone, doubt about the result can be settled with evidence instead of argument.",
+    "**Inclusion.** A secure remote option could help voters who cannot reach a polling booth, such as migrants, the elderly and people with disabilities.",
+    "**Privacy.** The design collects no more than it needs; raw identity numbers are not kept, and a ballot cannot be linked to a voter.",
+    "**Cost and environment.** Less printing, transport and manpower is needed than for paper elections in small and medium bodies.",
+    "**Cautions.** Online voting can create risks of coercion and vote selling outside the polling booth, and not everyone has a device or internet access. These issues must be addressed before any real public use (Section 6.2)."
+  ]},
+  {"t": "h2", "text": "5.3 SDG Mapping"},
+  {"t": "table", "caption": "Table 5.3: Mapping to the United Nations Sustainable Development Goals [22]", "widths": [3.6, 12.0], "header": ["SDG", "Contribution of the project"], "boldFirstCol": true, "rows": [
+    ["SDG 16: Peace, Justice and Strong Institutions", "Targets 16.6 and 16.7: more transparent and accountable institutions and inclusive decision-making through a verifiable, tamper-evident vote."],
+    ["SDG 9: Industry, Innovation and Infrastructure", "Target 9.c and 9.5: applies modern information technology and research to a public-service problem."],
+    ["SDG 10: Reduced Inequalities", "Target 10.2: a remote voting option can include people who find it hard to reach a polling booth."],
+    ["SDG 17: Partnerships for the Goals", "Open, standard tools and a public verification tool allow others to check and reuse the work."]
+  ]}
+]

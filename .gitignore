@@ -1,0 +1,86 @@
+# ─── Node.js ───────────────────────────────────────────────────────────────────
+# Ignore node_modules at ANY depth (root, subdirectories, nested)
+**/node_modules/
+node_modules/
+
+# Dependency lock files (keep package-lock.json but ignore yarn.lock if present)
+# npm-debug.log*
+# yarn-debug.log*
+# yarn-error.log*
+.pnp
+.pnp.js
+
+# ─── Hardhat / Foundry ─────────────────────────────────────────────────────────
+# Compiled artifacts & cache (reproducible via `npx hardhat compile`)
+artifacts/
+**/artifacts/
+cache/
+**/cache/
+
+# Hardhat network files
+.hardhat/
+
+# Ignition deployment artifacts (keep the modules, ignore actual deployments)
+ignition/deployments/
+**/ignition/deployments/
+
+# ─── Environment & Secrets ─────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# ─── TypeChain generated types ─────────────────────────────────────────────────
+typechain/
+typechain-types/
+**/typechain/
+**/typechain-types/
+
+# ─── Build outputs ─────────────────────────────────────────────────────────────
+dist/
+build/
+out/
+**/dist/
+**/build/
+**/out/
+
+# ─── Logs ──────────────────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ─── OS & Editor ───────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── Temporary files ───────────────────────────────────────────────────────────
+tmp/
+temp/
+*.tmp
+*.bak
+
+# ─── Binary / Office / Media files (too large for git) ─────────────────────────
+*.docx
+*.doc
+*.pdf
+*.pptx
+*.ppt
+*.xlsx
+*.xls
+
+# Image renders in report and ppt-review (large PNGs/JPGs)
+report/img/
+report/qa/
+ppt-review/render-demo/
+ppt-review/render-after/

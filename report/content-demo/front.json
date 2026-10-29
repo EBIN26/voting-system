@@ -1,0 +1,28 @@
+{
+  "abstract": "Electronic voting must let every eligible person vote exactly once while keeping every vote secret, and it must let the public check the result. This project builds and demonstrates a blockchain voting system that does this. The voter opens a single web page and presses the Vote button for a candidate. A backend running on a cloud server then carries out five steps in about 0.23 seconds. It checks that voting is open, verifies the voter through a Keccak-256 voter hash on the electoral roll, issues a one-time voting token that is stored with no link to the voter, encrypts the ballot with AES-256-GCM and RSA-3072 into a fixed 430 bytes, and records it through a Solidity smart contract on an Ethereum blockchain. The smart contract, not the server, enforces the voting window, the voter limit and one ballot per token. The election private key never exists in one place: it is split among three trustees, any two of whom can decrypt after voting closes and submit the count, which the contract accepts only when two trustees agree. The key is then published so that anyone can recount. The prototype passed 107 automated tests and ran a full election correctly, refusing a repeated vote and a voter who was not on the roll. On the local test chain a vote costs about 417,000 gas. The system was also deployed on an Oracle Cloud server behind HTTPS and on the Sepolia public test network, where a full four-voter election was run, counted by two trustees and verified by a public recount; there a ballot used about 1.81 million gas. The report also explains what the demonstration does and does not prove.",
+  "keywords": "Blockchain, E-voting, Smart contract, Ethereum, Cloud deployment, Hybrid encryption, AES-256-GCM, RSA-OAEP, Shamir secret sharing, Keccak-256, Verifiability",
+  "abbreviations": [
+    ["AAD", "Additional Authenticated Data"],
+    ["AES", "Advanced Encryption Standard"],
+    ["API", "Application Programming Interface"],
+    ["CSP", "Content Security Policy"],
+    ["DApp", "Decentralised Application"],
+    ["DNS", "Domain Name System"],
+    ["ECE", "Electronics and Communication Engineering"],
+    ["EVM", "Ethereum Virtual Machine"],
+    ["GCM", "Galois/Counter Mode"],
+    ["HMAC", "Hash-based Message Authentication Code"],
+    ["HTTPS", "Hypertext Transfer Protocol Secure"],
+    ["IV", "Initialisation Vector"],
+    ["OAEP", "Optimal Asymmetric Encryption Padding"],
+    ["PoS", "Proof of Stake"],
+    ["RPC", "Remote Procedure Call"],
+    ["RSA", "Rivest-Shamir-Adleman"],
+    ["SDG", "Sustainable Development Goal"],
+    ["SHA", "Secure Hash Algorithm"],
+    ["SQL", "Structured Query Language"],
+    ["SSH", "Secure Shell"],
+    ["TLS", "Transport Layer Security"],
+    ["VM", "Virtual Machine"]
+  ]
+}

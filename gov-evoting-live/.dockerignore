@@ -1,0 +1,16 @@
+node_modules
+live
+ceremony
+data
+.env
+.env.*
+cache
+test
+backend-tests
+artifacts/build-info
+artifacts/@*
+artifacts/contracts/GovElection.sol/*.dbg.json
+tally.json
+published-*.pem
+frontend/public/*.js
+*.md

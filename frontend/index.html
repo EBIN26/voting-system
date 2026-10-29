@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blockchain E-Voting</title>
+<style>
+  :root { --bg:#f6f7f9; --fg:#1b1f24; --card:#fff; --muted:#667085; --accent:#2f6fed; --line:#e3e6eb; --ok:#127a3f; --err:#b42318; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14171c; --fg:#e8eaed; --card:#1d2128; --muted:#98a2b3; --line:#2c323b; --accent:#6c9bff; --ok:#4cc38a; --err:#ff7b72; } }
+  body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.5 system-ui,sans-serif; }
+  main { max-width:640px; margin:0 auto; padding:24px 16px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:16px; }
+  h1 { font-size:1.4rem; margin:0 0 4px; } h2 { font-size:1.05rem; margin:0 0 12px; }
+  .muted { color:var(--muted); font-size:.9rem; }
+  button { background:var(--accent); color:#fff; border:0; border-radius:8px; padding:10px 14px; font:inherit; cursor:pointer; margin:4px 4px 4px 0; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  label { display:block; padding:8px 0; }
+  .bar { height:10px; background:var(--line); border-radius:6px; overflow:hidden; } .bar > div { height:100%; background:var(--accent); }
+  #msg { min-height:1.4em; } .ok { color:var(--ok); } .err { color:var(--err); }
+  code { word-break:break-all; font-size:.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <h1 id="title">Blockchain E-Voting</h1>
+    <div class="muted">Account: <code id="account">not connected</code></div>
+    <div class="muted">Phase: <strong id="phase">-</strong> · Registered <span id="reg">0</span> · Committed <span id="com">0</span> · Revealed <span id="rev">0</span></div>
+    <button id="connect">Connect wallet</button>
+    <div id="msg" role="status"></div>
+  </div>
+
+  <div class="card" id="voterCard" hidden>
+    <h2>Your ballot</h2>
+    <div id="choices"></div>
+    <button id="commit">1. Commit vote (Commit phase)</button>
+    <button id="reveal">2. Reveal vote (Reveal phase)</button>
+    <p class="muted">Your choice and a random secret are kept in this browser between commit and reveal. Don't clear site data until you've revealed.</p>
+  </div>
+
+  <div class="card" id="adminCard" hidden>
+    <h2>Election authority</h2>
+    <button id="next">Advance phase</button>
+  </div>
+
+  <div class="card" id="resultsCard" hidden>
+    <h2>Final results</h2>
+    <div id="results"></div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+<script>
+const PHASES = ["Registration", "Commit", "Reveal", "Ended"];
+const NEXT = { 0: ["startCommit", "Start commit phase"], 1: ["startReveal", "Start reveal phase"], 2: ["endElection", "End election"] };
+const $ = (id) => document.getElementById(id);
+let cfg, provider, signer, contract, me, admin, names = [];
+
+function say(text, cls) { $("msg").textContent = text; $("msg").className = cls || ""; }
+async function run(fn) {
+  try { say("Waiting for confirmation..."); await fn(); say("Done.", "ok"); await refresh(); }
+  catch (e) { say(e.reason || e.shortMessage || e.message, "err"); }
+}
+const storeKey = () => "vote:" + cfg.address + ":" + me;
+
+async function connect() {
+  cfg = await (await fetch("config.json")).json();
+  provider = new ethers.BrowserProvider(window.ethereum);
+  await provider.send("eth_requestAccounts", []);
+  signer = await provider.getSigner();
+  me = await signer.getAddress();
+  contract = new ethers.Contract(cfg.address, cfg.abi, signer);
+  admin = await contract.admin();
+  names = await contract.candidates();
+  $("title").textContent = await contract.title();
+  $("account").textContent = me;
+  $("connect").hidden = true;
+  await refresh();
+}
+
+async function refresh() {
+  const phase = Number(await contract.phase());
+  $("phase").textContent = PHASES[phase];
+  $("reg").textContent = await contract.registeredCount();
+  $("com").textContent = await contract.committedCount();
+  $("rev").textContent = await contract.revealedCount();
+
+  const v = await contract.voters(me);
+  const isAdmin = me.toLowerCase() === admin.toLowerCase();
+  $("adminCard").hidden = !isAdmin || phase === 3;
+  if (NEXT[phase]) $("next").textContent = NEXT[phase][1];
+  $("voterCard").hidden = !v.registered;
+  $("commit").disabled = phase !== 1 || v.committed;
+  $("reveal").disabled = phase !== 2 || !v.committed || v.revealed;
+
+  $("choices").innerHTML = names.map((n, i) =>
+    `<label><input type="radio" name="c" value="${i}"> ${n.replace(/[<>&]/g, "")}</label>`).join("");
+
+  $("resultsCard").hidden = phase !== 3;
+  if (phase === 3) {
+    const r = (await contract.results()).map(Number);
+    const total = r.reduce((a, b) => a + b, 0) || 1;
+    $("results").innerHTML = r.map((c, i) =>
+      `<div>${names[i].replace(/[<>&]/g, "")}: <strong>${c}</strong></div><div class="bar"><div style="width:${(c / total) * 100}%"></div></div>`).join("");
+  }
+}
+
+$("connect").onclick = () => run(connect);
+$("next").onclick = () => run(async () => {
+  const phase = Number(await contract.phase());
+  await (await contract[NEXT[phase][0]]()).wait();
+});
+$("commit").onclick = () => run(async () => {
+  const sel = document.querySelector("input[name=c]:checked");
+  if (!sel) throw new Error("Pick a candidate first");
+  const candidate = Number(sel.value);
+  const salt = ethers.hexlify(ethers.randomBytes(32));
+  const commitment = await contract.computeCommitment(candidate, salt, me);
+  // Save before sending so a crash after submit doesn't lose the secret.
+  localStorage.setItem(storeKey(), JSON.stringify({ candidate, salt }));
+  await (await contract.commitVote(commitment)).wait();
+});
+$("reveal").onclick = () => run(async () => {
+  const saved = JSON.parse(localStorage.getItem(storeKey()) || "null");
+  if (!saved) throw new Error("No saved ballot in this browser");
+  await (await contract.revealVote(saved.candidate, saved.salt)).wait();
+  localStorage.removeItem(storeKey());
+});
+
+if (window.ethereum) window.ethereum.on?.("accountsChanged", () => location.reload());
+else say("Install MetaMask (or another wallet) to vote.", "err");
+</script>
+</body>
+</html>

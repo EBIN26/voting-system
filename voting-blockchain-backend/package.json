@@ -1,0 +1,40 @@
+{
+  "name": "voting-blockchain-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsx server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "crypto": "^1.0.1",
+    "dotenv": "^17.4.2",
+    "ethers": "^6.17.0",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
+    "helmet": "^8.3.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^4.0.15",
+    "@nomicfoundation/hardhat-ignition": "^3.1.8",
+    "@nomicfoundation/hardhat-toolbox": "^7.0.0",
+    "@nomicfoundation/hardhat-toolbox-mocha-ethers": "^3.0.7",
+    "@types/chai": "^5.2.3",
+    "@types/chai-as-promised": "^8.0.2",
+    "@types/cors": "^2.8.19",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.20.1",
+    "chai": "^6.2.2",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.4",
+    "hardhat": "^3.13.0",
+    "mocha": "^11.3.0",
+    "tsx": "^4.23.12",
+    "typescript": "~6.0.3"
+  }
+}

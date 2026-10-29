@@ -1,0 +1,40 @@
+{
+  "name": "gov-evoting-live",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test && node --test backend-tests/*.test.js",
+    "node": "hardhat node",
+    "deploy": "hardhat run scripts/deploy-local.js --network localhost",
+    "start": "node backend/server.js",
+    "seed": "node scripts/seed-mock.js",
+    "build:frontend": "node frontend/build.js",
+    "demo": "node scripts/demo-start.js",
+    "demo:simple": "node scripts/demo-start.js --simple",
+    "live:wallets": "node scripts/live-wallets.js",
+    "live:balances": "node scripts/live-wallets.js --balances",
+    "live:deploy": "hardhat run scripts/deploy-live.js --network sepolia",
+    "live:bundle": "node scripts/make-cloud-bundle.js",
+    "live:rehearse": "hardhat run scripts/deploy-live.js --network rehearsal",
+    "live:fund-local": "node scripts/fund-local.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.29.1"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.8.0",
+    "dotenv": "^18.0.8",
+    "esbuild": "^0.28.2",
+    "ethers": "^6.17.0",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.1",
+    "helmet": "^8.3.0",
+    "shamir-secret-sharing": "^0.0.4"
+  }
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Anonymous Voting</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header class="card">
+    <h1 id="title">Anonymous Voting</h1>
+    <p class="muted">Zero-knowledge ballot: nobody, including the server, can tell how you voted.</p>
+    <div class="stats">
+      <div><span class="label">Phase</span><strong id="phase">-</strong></div>
+      <div><span class="label">Registered</span><strong id="registered">-</strong></div>
+      <div><span class="label">Votes cast</span><strong id="votes">-</strong></div>
+      <div><span class="label">Time left</span><strong id="timeleft">-</strong></div>
+    </div>
+  </header>
+
+  <div id="status" class="status" role="status" aria-live="polite"></div>
+
+  <section class="card" id="registerCard" hidden>
+    <h2>1. Register</h2>
+    <p>Enter the one-time code you were given. Your secret identity is created on this device and never leaves it.</p>
+    <form id="registerForm" autocomplete="off">
+      <label for="code">One-time code</label>
+      <input id="code" name="code" placeholder="XXXX-XXXX-XXXX-XXXX" maxlength="40" required autocomplete="off" spellcheck="false">
+      <button type="submit" id="registerBtn">Register</button>
+    </form>
+  </section>
+
+  <section class="card" id="voteCard" hidden>
+    <h2>2. Vote</h2>
+    <p id="voteHint" class="muted"></p>
+    <form id="voteForm">
+      <fieldset id="choices"><legend class="sr-only">Candidates</legend></fieldset>
+      <button type="submit" id="voteBtn">Cast anonymous vote</button>
+    </form>
+    <div class="progress" id="progressWrap" hidden><div id="progressBar"></div></div>
+  </section>
+
+  <section class="card" id="finalizeCard" hidden>
+    <h2>Voting has closed</h2>
+    <p>Anyone can finalise the election to publish the results.</p>
+    <button id="finalizeBtn" type="button">Finalise and show results</button>
+  </section>
+
+  <section class="card" id="resultsCard" hidden>
+    <h2>Final results</h2>
+    <div id="results"></div>
+  </section>
+
+  <section class="card" id="identityCard">
+    <h2>Your identity</h2>
+    <p class="muted">Your secret identity is stored in this browser. Back it up: without it you cannot vote, and anyone who has it can vote as you.</p>
+    <div class="row">
+      <button id="exportBtn" type="button" class="secondary">Download backup</button>
+      <button id="importBtn" type="button" class="secondary">Restore backup</button>
+      <input id="importFile" type="file" accept=".txt" hidden>
+    </div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

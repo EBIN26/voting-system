@@ -1,0 +1,48 @@
+[
+  {"t": "h1", "num": "2", "title": "LITERATURE REVIEW AND OBJECTIVES"},
+  {"t": "h2", "text": "2.1 Literature Review"},
+  {"t": "p", "text": "Anonymous electronic voting starts with Chaum's 1981 paper on untraceable electronic mail, which introduced mixing so that a message cannot be traced to its sender [12]. Nakamoto's Bitcoin paper [1] introduced the blockchain as a way for strangers to agree on a shared record without a trusted party, and Buterin's Ethereum white paper [2] added programmable smart contracts, whose formal definition is given in the Yellow Paper [3]. Overviews of the technology can be found in [4] and [5]."},
+  {"t": "p", "text": "Christidis and Devetsikiotis [6] explained how smart contracts and blockchains can replace intermediaries in many applications, and Kshetri and Voas [14] examined blockchain-enabled voting, noting both its promise for transparency and its open problems of privacy and coercion. Hjalmarsson et al. [13] built a blockchain voting system on an Ethereum-based network and showed the benefit of an immutable record, but their design relied on administrators for identity and its scalability was limited."},
+  {"t": "p", "text": "McCorry, Shahandashti and Hao [16] presented an implementation of a decentralised, self-tallying voting protocol on Ethereum (the Open Vote Network). It gives strong ballot privacy without trusted tellers, but it needs an interactive protocol between all voters, which is hard to run for a general election. Adida's Helios [15] is a web-based, end-to-end verifiable voting system in which ballots are encrypted and the tally can be audited. It showed the value of public verification, but it keeps its trust in a central server and in a small set of trustees. Park, Specter, Narula and Rivest [17] argue that internet voting remains hard to secure and that a blockchain alone does not solve ballot secrecy or malware on the voter's device. Their warning shapes the scope of this prototype."},
+  {"t": "p", "text": "For the cryptography, RSA [7] with OAEP padding [10] protects a short key, and Galois/Counter Mode [9] provides authenticated encryption of the ballot. HMAC [11] with a hash function turns a voter's identity into a voter hash that cannot be reversed without a secret. The hash used is Keccak-256, the function used inside Ethereum. It is the original Keccak algorithm from which the NIST SHA-3 standard [20] was derived; the two differ only in their padding. Shamir's secret sharing [8] splits a key so that any threshold number of shares rebuild it and fewer reveal nothing, which suits a decryption key held jointly by trustees."},
+  {"t": "table", "caption": "Table 2.1: Summary of related work and what this project adds", "widths": [3.6, 5.8, 6.2], "header": ["Work", "Contribution", "Limitation addressed here"], "boldFirstCol": true, "rows": [
+    ["Helios [15]", "Browser encryption, public audit of the tally", "Central server; no smart contract enforcing the rules"],
+    ["Open Vote Network [16]", "Self-tallying, private voting on Ethereum", "Interactive protocol; cost grows with the number of voters"],
+    ["Hjalmarsson et al. [13]", "Blockchain voting on an Ethereum-based network", "Administrators trusted for identity; no shared decryption key"],
+    ["Kshetri and Voas [14]", "Analysis of blockchain voting", "Discussion only; no implementation"],
+    ["This project", "Voter hash, token unlinked from the voter, fixed-size encrypted ballot, contract-enforced rules, 2-of-3 trustees, public recount, cloud packaging, tests and measurements", "Identity proof (such as an OTP service) is not part of the demonstration; one backend submits ballots (see Section 6.2)"]
+  ]},
+  {"t": "h2", "text": "2.2 Objective"},
+  {"t": "p", "text": "The main objective is to design, build, demonstrate and test a secure and verifiable blockchain voting system in which one button press starts the whole backend process. The specific objectives are:"},
+  {"t": "steps", "items": [
+    "To represent each voter in the system only by a keyed hash, and to check that hash against an electoral roll.",
+    "To issue each voter one single-use voting token that cannot be traced back to the voter.",
+    "To encrypt every ballot into a fixed-size ciphertext so that no one can read it before the election ends.",
+    "To record the ballots in a smart contract that enforces the election phases, the voter limit and one ballot per token.",
+    "To place the decryption key under shared control of three trustees, any two of whom can decrypt.",
+    "To allow anyone to verify the result by decrypting and recounting with the published key.",
+    "To package the backend so that it can run on a cloud server with HTTPS and connect to a public Ethereum test network.",
+    "To test the system thoroughly and to measure its speed and cost."
+  ]},
+  {"t": "h2", "text": "2.3 Scope of the Project"},
+  {"t": "p", "text": "The project covers the complete life of one election: key ceremony, deployment of the contract, voting through a one-page demonstration site, closing, decryption, tallying and public verification. The prototype was developed and measured on a local test blockchain, and was then deployed on an Oracle Cloud server and on the Sepolia public test network, where a complete election was run."},
+  {"t": "p", "text": "The following are outside the scope: proof of the voter's real identity (an OTP or Aadhaar check), biometric verification, protection against malware on the voter's own device, resistance to coercion away from a polling booth, and an independent security audit. The demonstration uses dummy voter IDs. These limits are stated again in the conclusion."},
+  {"t": "h2", "text": "2.4 Motivation"},
+  {"t": "ul", "items": [
+    "India has the largest electorate in the world, and any improvement in the speed, cost and trustworthiness of voting has a very large effect.",
+    "Many eligible voters, such as migrant workers, people living abroad, the elderly and people with disabilities, find it difficult to reach a polling booth.",
+    "Public confidence in elections is damaged by disputes over counting. A result that anybody can recheck would reduce such disputes.",
+    "The team wished to apply the subjects studied in the course, namely networks, security and software, to a problem that matters to society."
+  ]},
+  {"t": "h2", "text": "2.5 Application"},
+  {"t": "p", "text": "The design applies wherever a trustworthy, secret ballot is needed:"},
+  {"t": "ul", "items": [
+    "student council and university body elections;",
+    "elections of cooperative societies, resident welfare associations and trade unions;",
+    "shareholder and board voting in companies;",
+    "opinion polls and referendums within organisations;",
+    "a base for later, larger systems after proper audit and with a real identity check."
+  ]},
+  {"t": "h2", "text": "2.6 Organization of the Report"},
+  {"t": "p", "text": "Chapter 1 introduces the problem, the research gap and the engineering attributes. Chapter 2 reviews the literature and states the objectives, scope, motivation and applications. Chapter 3 explains the methodology: existing methods, the proposed method, the architecture with the cloud server, the main components, the workflow of one vote and of the whole election, the design constraints, the standards followed and the threat model. Chapter 4 lists the hardware and software used. Chapter 5 presents the demonstration, the tests and measurements, the impact on society and the mapping to the Sustainable Development Goals. Chapter 6 concludes the report and suggests future work. The references follow."}
+]

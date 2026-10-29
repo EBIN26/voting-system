@@ -1,0 +1,23 @@
+[
+  {"t": "h1", "num": "6", "title": "CONCLUSION AND FUTURE WORK"},
+  {"t": "h2", "text": "6.1 Conclusion"},
+  {"t": "p", "text": "This project designed, built and tested a prototype of a blockchain-based voting system that keeps the vote secret, allows one vote per eligible voter, spreads control of the decryption key over three trustees, and lets anyone check the result. Trust is divided: the backend cannot read a vote, the contract cannot identify a voter, and no single trustee can decrypt. The rules of the election are enforced by the smart contract, not by the web server."},
+  {"t": "p", "text": "The prototype passed 107 automated tests, completed a full demonstration election with the correct result, refused a repeated vote and an ineligible voter, took about 0.23 seconds per vote and cost about 417,000 gas per ballot. The results support the main claim of the report: verifiable, anonymous and tamper-evident voting can be built from standard and well-reviewed cryptographic parts."},
+  {"t": "h2", "text": "6.2 Limitations"},
+  {"t": "ul", "items": [
+    "The Aadhaar OTP service and the SMS delivery are simulated; the real services need official approval.",
+    "The backend submits all ballots, so it could refuse to submit a ballot (denial of service). It cannot read or change one, but a real system needs several independent submitters.",
+    "The prototype does not protect a voter whose own device has malware, and it cannot stop coercion or vote selling away from a polling booth.",
+    "The prototype was run on a local test chain. Deployment to the Sepolia public test network and to a cloud server is prepared and was rehearsed locally, but the live deployment was not complete when this report was written.",
+    "The system has not had an independent security audit."
+  ]},
+  {"t": "h2", "text": "6.3 Future Work"},
+  {"t": "ul", "items": [
+    "Complete the deployment on the Sepolia test network and a cloud server with HTTPS, and run a trial election with real students.",
+    "Connect to a real identity service and SMS gateway after the necessary approval.",
+    "Move to a zero-knowledge membership proof, such as the Semaphore protocol (a first version was built in this project's workspace), so that even the backend cannot link a voter to a ballot.",
+    "Allow several independent submitters and a layer-2 network to lower the cost and the delay.",
+    "Add receipts that let a voter check that the ballot was recorded unchanged, without proving how they voted.",
+    "Commission an independent security review and a usability study before any real use."
+  ]}
+]

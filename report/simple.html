@@ -1,0 +1,114 @@
+<html><head><meta charset="utf-8">
+<style>
+body { font-family: Calibri, Arial, sans-serif; font-size: 13pt; color: #111; line-height: 1.3; }
+h1 { font-size: 26pt; color: #156082; margin: 0 0 4pt 0; }
+h2 { font-size: 16pt; color: #156082; margin: 16pt 0 5pt 0; }
+p, li { margin: 4pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 6pt 0; }
+td, th { border: 1px solid #999; padding: 5pt 7pt; vertical-align: top; font-size: 12pt; }
+th { background: #e6e6e6; text-align: left; }
+.box { background: #eef4f8; border: 1px solid #156082; padding: 7pt 10pt; }
+.note { background: #fff4d6; border: 1px solid #d8b24a; padding: 7pt 10pt; }
+.small { font-size: 10.5pt; color: #444; }
+</style></head><body>
+
+<h1>Start here</h1>
+<p><b>Our voting project in simple words</b><br>
+Read this first (about 10 minutes). It has no technical words. After this, the longer guide, &ldquo;Project explained&rdquo;, will be easy to follow.</p>
+
+<div class="box"><b>In one sentence:</b> we built a way to vote on a computer where nobody can cheat, nobody can see who you voted for, and anyone can check that the final count is correct.</div>
+
+<h2>1. What problem are we solving?</h2>
+<p>Think about a class election.</p>
+<ul>
+<li>If the teacher counts the votes alone, we have to <b>trust</b> the teacher.</li>
+<li>If the teacher sees every paper, your vote is <b>not secret</b>.</li>
+<li>If someone can add extra papers, the <b>result can be wrong</b>.</li>
+</ul>
+<p>Our project tries to fix all three: a vote that is <b>secret</b>, a count that <b>cannot be changed</b>, and a result that <b>anyone can check</b>.</p>
+
+<h2>2. The idea: a locked box and a notebook everyone can read</h2>
+<p>Picture a ballot box in the middle of the school ground.</p>
+<ul>
+<li>Every voter puts their vote in a <b>locked envelope</b>. Nobody can see inside.</li>
+<li>Next to the box is a <b>big notebook</b> that everyone can read. Every envelope is written into it, one after another. <b>Nobody can erase or change a line</b>, not even us.</li>
+<li>A <b>strict rule-keeper</b> watches the box. It says: one envelope per person, only during voting time, and no extra envelopes.</li>
+<li>The <b>key to open the envelopes</b> is cut into <b>three pieces</b> and given to <b>three helpers</b>. Any two helpers together can open them, but <b>only after voting has ended</b>. One helper alone can do nothing.</li>
+<li>At the end, the helpers open the envelopes and count. Then the key is shown to everyone, so <b>anybody can open the envelopes and count again</b> to check.</li>
+</ul>
+<p>That is our whole project. We just built it with computers.</p>
+
+<br style="page-break-before:always"><h2>3. What happens when one person votes?</h2>
+<p>The voter opens a web page and presses a button next to a name. That is all the voter does. Then the computer does five small jobs, very fast:</p>
+<table>
+<tr><th style="width:8%">Job</th><th style="width:34%">In simple words</th><th>Everyday example</th></tr>
+<tr><td><b>1</b></td><td>Check that voting is open and the request is valid.</td><td>The teacher checks the clock: &ldquo;Is voting time on?&rdquo;</td></tr>
+<tr><td><b>2</b></td><td>Check that this person is allowed to vote.</td><td>Looking for your name on the class list.</td></tr>
+<tr><td><b>3</b></td><td>Give the person a one-time ticket, and remember that they voted.</td><td>A ticket you can use only once. A second try is refused.</td></tr>
+<tr><td><b>4</b></td><td>Lock the vote in a secret envelope.</td><td>Putting your paper in a sealed envelope.</td></tr>
+<tr><td><b>5</b></td><td>Write the sealed envelope in the public notebook.</td><td>The envelope goes into the box and the notebook.</td></tr>
+</table>
+<p>If any job fails, the vote stops there. For example, someone who already voted is stopped at job 3, and someone who is not on the list is stopped at job 2.</p>
+
+<div class="note"><b>A secret kept safe:</b> the class list does not keep real names. It keeps a scrambled code made from each name, and a scrambled code cannot be turned back into the name. The ticket list does not say whose ticket is whose. So even if someone looked through everything, they could not tell who voted for whom.</div>
+
+<br style="page-break-before:always"><h2>4. Who is involved?</h2>
+<table>
+<tr><th style="width:26%">Who</th><th>What they do</th></tr>
+<tr><td><b>The voter</b></td><td>Presses the button for their choice.</td></tr>
+<tr><td><b>The server</b> (a computer on the internet)</td><td>Does the five jobs above.</td></tr>
+<tr><td><b>The notebook</b> (called the blockchain)</td><td>A public record that nobody can erase. It keeps every sealed envelope.</td></tr>
+<tr><td><b>The rule-keeper</b> (called the smart contract)</td><td>A small program living in the notebook. It makes sure the rules are followed.</td></tr>
+<tr><td><b>The administrator</b></td><td>Starts the election. Cannot see the votes or end it early.</td></tr>
+<tr><td><b>Three helpers</b> (called trustees)</td><td>Each holds one piece of the key. Two together open the envelopes and count.</td></tr>
+<tr><td><b>Everyone else</b></td><td>Can read the notebook and check the count.</td></tr>
+</table>
+
+<h2>5. Five promises our system makes</h2>
+<ol>
+<li><b>One person, one vote.</b> The one-time ticket and the rule-keeper both make sure of this.</li>
+<li><b>Your vote is secret.</b> It is locked in an envelope, and the envelope looks the same for everybody.</li>
+<li><b>Nobody can change the votes.</b> The notebook cannot be erased.</li>
+<li><b>No single person has all the power.</b> The key is split among three helpers.</li>
+<li><b>Anyone can check the result.</b> The key is shown at the end, so anybody can count again.</li>
+</ol>
+
+<br style="page-break-before:always"><h2>6. What did we actually do?</h2>
+<ul>
+<li>We <b>built</b> the whole thing and <b>tested</b> it (107 automatic checks, all passed).</li>
+<li>We put the voting page on a <b>real computer on the internet</b> (a free cloud computer).</li>
+<li>We used a <b>real public practice notebook</b> (a test blockchain called Sepolia) where the money is fake, so it is free.</li>
+<li>We ran a <b>real election</b> with 4 voters. The result was Ann 2, Ben 1, Cat 1. Two helpers counted, and a check by anyone matched.</li>
+<li>We also saw the system <b>refuse</b> a person who tried to vote twice and a person who was not on the list.</li>
+</ul>
+
+<h2>7. What is real, and what is pretend?</h2>
+<div class="note">
+<p>It is important to be honest about this:</p>
+<ul>
+<li>The voters in our demo are <b>made-up people</b>. We do not check a real identity (like an Aadhaar OTP) in the demo. That would be the next step.</li>
+<li>In our demo page, the server puts the vote in the envelope itself, so it briefly sees the choice. In the full version, the voter's own browser does this, so the server never sees it.</li>
+<li>The helpers' passwords are public in the demo, so it is not secure for a real election.</li>
+<li>It is a <b>prototype</b>, a first working model. It has not been checked by outside security experts, and it is not ready for a real election.</li>
+</ul>
+</div>
+
+<br style="page-break-before:always"><h2>8. Six words you will hear, in simple language</h2>
+<table>
+<tr><th style="width:30%">Word</th><th>Simple meaning</th></tr>
+<tr><td><b>Blockchain</b></td><td>The public notebook that cannot be erased.</td></tr>
+<tr><td><b>Smart contract</b></td><td>The rule-keeper program that lives in the notebook.</td></tr>
+<tr><td><b>Encryption</b></td><td>Locking something so only the right key can open it.</td></tr>
+<tr><td><b>Hash</b></td><td>A scrambled code made from something, which cannot be turned back.</td></tr>
+<tr><td><b>Trustee</b></td><td>One of the three helpers who hold a piece of the key.</td></tr>
+<tr><td><b>Token</b></td><td>The one-time ticket that lets a person vote once.</td></tr>
+</table>
+
+<h2>9. If someone asks you &ldquo;what is your project?&rdquo;</h2>
+<div class="box">&ldquo;It is an online voting system. You press a button to vote. Your vote is locked so nobody can see it, and it is written into a public record that nobody can change. Each person can vote only once. After the election, three trusted people open the votes together and count them, and then anyone can recount to check. We built it, tested it, and ran a real test election on a public practice network.&rdquo;</div>
+
+<h2>What next?</h2>
+<p>Now read <b>&ldquo;Project explained&rdquo;</b>. It uses the same story but adds the technical names for each piece, with pictures. Whenever a new word appears, come back to section 8 here.</p>
+<p class="small">Questions are normal. Write them down and ask Ebin.</p>
+
+</body></html>

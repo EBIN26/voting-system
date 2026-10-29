@@ -1,0 +1,8 @@
+node_modules
+artifacts
+cache
+data
+.env
+.env.*
+!.env.example
+frontend/public/app.js

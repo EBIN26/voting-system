@@ -1,0 +1,29 @@
+{
+  "abstract": "Electronic voting must satisfy two demands that pull in opposite directions: every eligible citizen must be able to vote exactly once, and no one, not even the administrators, may learn how anyone voted. This project builds a working prototype of a secure voting system that meets both demands using blockchain technology. A voter logs in with a one-time password (the Aadhaar identity service is simulated), and the backend recognises the voter only through a Keccak-256 voter hash. After verification the voter receives a single-use voting token that carries no link to the voter's identity. The ballot is encrypted in the browser with a hybrid scheme, AES-256-GCM for the vote and RSA-3072 (OAEP) for the AES key, so that every ballot is exactly 430 bytes whichever candidate is chosen. The encrypted ballot is recorded by a Solidity smart contract that enforces the election phases, the voter limit and one ballot per token. The election private key never exists in one place: it is split among three trustees with Shamir secret sharing, and any two of them can rebuild it after voting closes, decrypt the ballots and submit the tally, which the contract accepts only when two trustees agree. The key is then published so that anyone can recount the votes. The system was tested with 107 automated tests, and a complete election with four voters, a repeated vote and an ineligible voter produced the correct result. A vote passes through all five backend steps in about 0.23 seconds and costs about 417,000 gas. The work shows that verifiable, anonymous and tamper-evident voting can be built from standard, well-reviewed cryptographic parts.",
+  "keywords": "Blockchain, E-voting, Smart contract, Ethereum, Hybrid encryption, AES-256-GCM, RSA-OAEP, Shamir secret sharing, Keccak-256, Anonymity, Verifiability",
+  "abbreviations": [
+    ["AAD", "Additional Authenticated Data"],
+    ["AES", "Advanced Encryption Standard"],
+    ["API", "Application Programming Interface"],
+    ["CSP", "Content Security Policy"],
+    ["DApp", "Decentralised Application"],
+    ["DPDP", "Digital Personal Data Protection (Act)"],
+    ["ECE", "Electronics and Communication Engineering"],
+    ["EVM", "Ethereum Virtual Machine"],
+    ["GCM", "Galois/Counter Mode"],
+    ["HMAC", "Hash-based Message Authentication Code"],
+    ["HTTPS", "Hypertext Transfer Protocol Secure"],
+    ["IV", "Initialisation Vector"],
+    ["OAEP", "Optimal Asymmetric Encryption Padding"],
+    ["OTP", "One-Time Password"],
+    ["PKCS", "Public-Key Cryptography Standards"],
+    ["PoS", "Proof of Stake"],
+    ["RPC", "Remote Procedure Call"],
+    ["RSA", "Rivest-Shamir-Adleman"],
+    ["SDG", "Sustainable Development Goal"],
+    ["SHA", "Secure Hash Algorithm"],
+    ["SQL", "Structured Query Language"],
+    ["UIDAI", "Unique Identification Authority of India"],
+    ["VM", "Virtual Machine"]
+  ]
+}

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
+<title>Online Voting</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <svg class="logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1.2 14.2-3.5-3.5 1.4-1.4 2.1 2.1 4.6-4.6 1.4 1.4-6 6Z"/>
+  </svg>
+  <div>
+    <h1 id="title">Online Voting</h1>
+    <p class="muted" id="subtitle">Secure, private and verifiable</p>
+  </div>
+</header>
+
+<main id="main">
+  <div id="demoBanner" class="banner" hidden>
+    <strong>Demo mode.</strong> No real SMS is sent, so the one-time password (OTP) is shown on screen.
+  </div>
+
+  <section class="card" aria-labelledby="statusHeading">
+    <h2 id="statusHeading" class="sr-only">Election status</h2>
+    <div class="status-row">
+      <span class="chip" id="phaseChip">Loading…</span>
+      <span id="timeLeft" class="muted"></span>
+    </div>
+    <p id="phaseText" class="phase-text"></p>
+  </section>
+
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+  <!-- Home -->
+  <section class="card screen" id="screen-home" aria-labelledby="homeHeading">
+    <h2 id="homeHeading" tabindex="-1">Welcome</h2>
+    <p>You vote in three simple steps. Your vote is encrypted on this device before it leaves it, and nobody can link it to you.</p>
+    <ol class="how">
+      <li><strong>Register</strong> once with your Aadhaar number and an OTP.</li>
+      <li><strong>Log in</strong> with a new OTP when you are ready to vote.</li>
+      <li><strong>Vote</strong> and keep your confirmation code.</li>
+    </ol>
+    <div class="actions">
+      <button type="button" id="goRegister" class="primary">Register</button>
+      <button type="button" id="goLogin" class="primary">Log in to vote</button>
+    </div>
+
+    <div id="resumeBox" class="resume" hidden>
+      <p id="resumeText"></p>
+      <button type="button" id="resumeBtn" class="primary">Continue to vote</button>
+    </div>
+    <div id="votedBox" class="resume" hidden>
+      <p>You have already voted from this browser.</p>
+      <button type="button" id="checkBtn" class="secondary">Check that my vote was recorded</button>
+    </div>
+
+    <details class="backup">
+      <summary>I saved a voting token earlier</summary>
+      <form id="tokenForm" autocomplete="off">
+        <label for="tokenInput">Voting token</label>
+        <input id="tokenInput" inputmode="text" spellcheck="false" autocomplete="off" placeholder="0x…">
+        <button type="submit" class="secondary">Use this token</button>
+      </form>
+    </details>
+  </section>
+
+  <!-- OTP (register or log in) -->
+  <section class="card screen" id="screen-otp" aria-labelledby="otpHeading" hidden>
+    <h2 id="otpHeading" tabindex="-1">Register</h2>
+    <p id="otpIntro"></p>
+
+    <form id="aadhaarForm" autocomplete="off">
+      <label for="aadhaar">Aadhaar number</label>
+      <input id="aadhaar" inputmode="numeric" maxlength="14" autocomplete="off" spellcheck="false" placeholder="1234 5678 9012" required aria-describedby="aadhaarHelp">
+      <p id="aadhaarHelp" class="help">12 digits. An OTP is sent to the phone linked to your Aadhaar. Your number is never stored.</p>
+      <div class="actions">
+        <button type="submit" id="sendOtp" class="primary">Send OTP</button>
+        <button type="button" class="secondary back">Back</button>
+      </div>
+    </form>
+
+    <form id="otpForm" autocomplete="off" hidden>
+      <p id="demoOtp" class="demo-otp" hidden></p>
+      <label for="otp">6-digit OTP</label>
+      <input id="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code" spellcheck="false" placeholder="••••••" required>
+      <div class="actions">
+        <button type="submit" id="verifyOtp" class="primary">Verify</button>
+        <button type="button" id="resend" class="secondary">Start again</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Registered -->
+  <section class="card screen" id="screen-registered" aria-labelledby="regDoneHeading" hidden>
+    <h2 id="regDoneHeading" tabindex="-1">You are registered</h2>
+    <p id="regDoneText"></p>
+    <div class="actions">
+      <button type="button" id="regToLogin" class="primary">Log in to vote</button>
+      <button type="button" class="secondary back">Home</button>
+    </div>
+  </section>
+
+  <!-- Ballot -->
+  <section class="card screen" id="screen-ballot" aria-labelledby="ballotHeading" hidden>
+    <h2 id="ballotHeading" tabindex="-1">Your ballot</h2>
+    <p>Choose one candidate. You cannot change your vote after you cast it.</p>
+    <form id="ballotForm">
+      <fieldset id="choices"><legend class="sr-only">Candidates</legend></fieldset>
+      <div class="actions">
+        <button type="submit" class="primary">Review my choice</button>
+      </div>
+    </form>
+    <div class="token-box">
+      <p class="help"><strong>Keep your voting token.</strong> It is your only way to vote and cannot be re-issued. This browser has saved it; keep a backup in case you switch devices.</p>
+      <button type="button" id="downloadToken" class="secondary">Download token backup</button>
+    </div>
+  </section>
+
+  <!-- Confirm -->
+  <section class="card screen" id="screen-confirm" aria-labelledby="confirmHeading" hidden>
+    <h2 id="confirmHeading" tabindex="-1">Confirm your vote</h2>
+    <p>You are voting for:</p>
+    <p class="choice-big" id="confirmChoice"></p>
+    <p class="help">Your choice is encrypted on this device. Only a group of election trustees acting together can decrypt it, and only after voting closes.</p>
+    <div class="actions">
+      <button type="button" id="castBtn" class="primary">Cast my vote</button>
+      <button type="button" id="changeBtn" class="secondary">Change my choice</button>
+    </div>
+    <div class="progress" id="progress" hidden><div></div></div>
+  </section>
+
+  <!-- Final results (shown only once the trustees have agreed) -->
+  <section class="card" id="resultsCard" aria-labelledby="resultsHeading" hidden>
+    <h2 id="resultsHeading">Final results</h2>
+    <div id="results"></div>
+    <p class="help" id="resultsNote"></p>
+  </section>
+
+  <!-- Done -->
+  <section class="card screen" id="screen-done" aria-labelledby="doneHeading" hidden>
+    <h2 id="doneHeading" tabindex="-1">Your vote was recorded</h2>
+    <p>Thank you for voting. Your vote is anonymous: nothing in this receipt shows who you are or how you voted.</p>
+    <p class="label">Your confirmation code</p>
+    <p class="code" id="receiptCode"></p>
+    <p class="help">Anyone can look this code up on the blockchain to see that a ballot with it was recorded.</p>
+    <div class="actions">
+      <button type="button" id="receiptCheck" class="secondary">Check it on the blockchain</button>
+      <button type="button" class="secondary back">Home</button>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <p class="muted">Election key fingerprint: <code id="fingerprint">-</code></p>
+  <p class="muted help">Compare this with the value published by the election authority. Your device checks that the key matches before it encrypts anything.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

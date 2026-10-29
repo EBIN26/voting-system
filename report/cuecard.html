@@ -1,0 +1,127 @@
+<html><head><meta charset="utf-8">
+<style>
+body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #111; }
+h1 { font-size: 20pt; color: #156082; margin: 0 0 4pt 0; }
+h2 { font-size: 14pt; color: #156082; margin: 12pt 0 4pt 0; border-bottom: 1px solid #156082; }
+h3 { font-size: 11.5pt; margin: 8pt 0 2pt 0; }
+p, li { margin: 2pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0; }
+td, th { border: 1px solid #888; padding: 3pt 5pt; vertical-align: top; font-size: 10.5pt; }
+th { background: #e6e6e6; text-align: left; }
+code { font-family: Consolas, monospace; font-size: 9.5pt; background: #f0f0f0; }
+.warn { background: #fff4d6; padding: 4pt 6pt; border: 1px solid #d8b24a; }
+</style></head><body>
+
+<h1>Review cue card: Secure blockchain voting system</h1>
+<p>M. Ebin Virjo (24626122) and K. Kirithika (24626160). Keep this next to you during the demo.</p>
+
+<h2>1. Before you go in (checklist)</h2>
+<table>
+<tr><th style="width:5%"></th><th>Check</th></tr>
+<tr><td>&#9744;</td><td>Open the slides (Demo version) and the voting page <code>https://e-voting-system.duckdns.org/simple.html</code> in advance. The page should say &ldquo;Not open yet&rdquo;.</td></tr>
+<tr><td>&#9744;</td><td>Open Etherscan on the <b>new</b> contract page and on the <b>first</b> contract page (<code>0x1239&hellip;9877</code>), which has the finished election.</td></tr>
+<tr><td>&#9744;</td><td>Open PowerShell in <code>D:\claude\test-voting\gov-evoting-live</code>. Run <code>cd D:\claude\test-voting\gov-evoting-live</code> if the prompt shows another folder.</td></tr>
+<tr><td>&#9744;</td><td>Have the new voter IDs ready (from <code>docker compose logs app</code> on the server). The last one is the voter who is not on the roll.</td></tr>
+<tr><td>&#9744;</td><td>Check the Submitter wallet still has Sepolia ETH: <code>npm run live:balances</code>.</td></tr>
+<tr><td>&#9744;</td><td>Close or hide: <code>wallets.json</code>, <code>server.env</code>, the DuckDNS token page, the SSH key folder, any Alchemy URL.</td></tr>
+<tr><td>&#9744;</td><td>Backup ready: the screenshots on slides 13 and 14 in case the network is slow.</td></tr>
+</table>
+
+<h2>2. What has changed since the last review (say in 1 minute)</h2>
+<ul>
+<li>It is now a <b>working system</b>: Solidity smart contract, backend, encryption, key splitting, and <b>107 automated tests</b>, all passing.</li>
+<li>A <b>one-button demo</b>: press Vote and the backend runs five steps by itself (about 0.23 s on the local chain).</li>
+<li>It is <b>deployed for real</b>: the contract is on the <b>Sepolia</b> public blockchain and the backend runs on an <b>Oracle Cloud</b> server with HTTPS (Docker + Caddy).</li>
+<li>A <b>complete election was run live</b>: 4 voters, 2 trustees counting, and a <b>public recount that matched</b> (Ann 2, Ben 1, Cat 1).</li>
+</ul>
+
+<h2>3. Demo order (about 10 minutes)</h2>
+
+<h3>Step A. Slides, 3 minutes</h3>
+<ul>
+<li>Slide 7, block diagram: browser &rarr; cloud server (Caddy, backend, database) &rarr; blockchain. Trustees, administrator and the public sit outside the server.</li>
+<li>Slide 9, &ldquo;What happens when you press Vote&rdquo;: five steps and where each can refuse.</li>
+<li>Slide 10, cloud: the server holds <b>only the public key and the submitter key</b>. The administrator wallet and trustee shares never go on the server.</li>
+</ul>
+
+<h3>Step B. Open the election (30 seconds)</h3>
+<p>In PowerShell:</p>
+<p><code>node scripts/admin.js --live open 4 60 300</code></p>
+<p>Voting opens in 60 seconds and stays open for <b>5 minutes</b>. Refresh the page when the badge says &ldquo;Voting open&rdquo;. While you wait, explain the contract phases: Setup &rarr; Voting &rarr; Closed &rarr; Finalized, forward only.</p>
+
+<h3>Step C. Live voting, 5-minute window</h3>
+<table>
+<tr><th style="width:30%">Do this</th><th>Say this</th></tr>
+<tr><td>Vote for one candidate with a valid ID</td><td>Point to each step: the <b>voter hash</b> (Keccak-256) found on the electoral roll; the <b>one-time token</b> &ldquo;stored with no link to the voter&rdquo;; the <b>430-byte ciphertext</b> (RSA-3072 + AES-256-GCM); then the transaction and block on the real blockchain.</td></tr>
+<tr><td>Press Vote again with the <b>same ID</b></td><td>&ldquo;Refused at step 3. The token already exists, and the contract would also refuse a second ballot.&rdquo;</td></tr>
+<tr><td>Use the <b>last ID</b> (not on the roll)</td><td>&ldquo;Refused at step 2. The voter hash is not on the roll. Nothing reaches the blockchain.&rdquo;</td></tr>
+<tr><td>Cast the other votes (4 ballots in total)</td><td>Each takes about 7 to 15 seconds because it waits for a real Sepolia block.</td></tr>
+</table>
+
+<h3>Step D. Etherscan (1 minute)</h3>
+<p>Open the new contract page. Show one <code>openElection</code> and the <code>castBallot</code> transactions. Say: &ldquo;Anyone in the world can see this. The ballots on the chain are encrypted, so they can't be read yet.&rdquo;</p>
+
+<h3>Step E. Close and count (after the window ends)</h3>
+<p>The window ends 5 minutes after it opens. Then, one at a time:</p>
+<p><code>node scripts/admin.js --live close</code></p>
+<p><code>node scripts/tally.js --live --demo-passphrases --shares ceremony/trustee-1.share.json,ceremony/trustee-2.share.json --publish-key published-election-private-key.pem</code></p>
+<p><code>node scripts/submit-tally.js --live --trustee 1</code></p>
+<p><code>node scripts/submit-tally.js --live --trustee 2</code></p>
+<p><code>node scripts/verify-tally.js --live --key published-election-private-key.pem</code></p>
+<p>Say: &ldquo;Two trustees rebuild the key and agree on the same count. The contract finalises it. Then the key is published and anyone can recount. <b>VERIFIED</b>.&rdquo; If time is short, show the finished first run (slides 13 and 14).</p>
+
+<h2>4. The five key messages (if you forget everything else)</h2>
+<ol>
+<li>One person cannot change or read the votes.</li>
+<li>Each voter votes once: a one-time token, checked in the database and by the contract.</li>
+<li>The vote is secret until the election closes: encrypted ballots, with the key split among three trustees (any two decrypt).</li>
+<li>The rules are enforced by the smart contract, not by the web server.</li>
+<li>Anyone can verify the result by recounting.</li>
+</ol>
+
+<h2>5. Limits to state yourself, before she asks</h2>
+<div class="warn">
+<ol>
+<li>The demo uses <b>dummy voter IDs</b>. A real identity check (such as an OTP) is future work.</li>
+<li>In this demo page the <b>server encrypts the ballot</b>, so it sees the voter and the choice together. The full app encrypts in the browser.</li>
+<li>Gas on Sepolia (about 1.81 million) is higher than my local figure (about 417,000). <b>We have not explained why.</b></li>
+<li>The trustee passphrases are public in the demo, so the key shares protect nothing in this run.</li>
+<li>It is a prototype, with no independent security audit.</li>
+</ol>
+</div>
+
+<br style="page-break-before:always">
+<h1>Likely questions and short answers</h1>
+
+<table>
+<tr><th style="width:4%">#</th><th style="width:36%">Question</th><th>Short answer</th></tr>
+<tr><td>1</td><td>Why use a blockchain at all?</td><td>So that no single person can change the rules or the ballots, and so the public can check them. A normal database gives the administrator that power.</td></tr>
+<tr><td>2</td><td>If the blockchain is public, how is the vote secret?</td><td>Only encrypted ballots go on it. Each one is 430 bytes and looks random, so its size and content reveal nothing until the trustees decrypt after closing.</td></tr>
+<tr><td>3</td><td>How do you stop someone voting twice?</td><td>The voter hash is checked against the roll, and each voter gets one token. The database refuses a second token, and the contract accepts each token hash only once.</td></tr>
+<tr><td>4</td><td>What is the voter hash for?</td><td>The server never stores identities. It stores Keccak-256 of an HMAC of the identity, so even someone who reads the database cannot easily recover the identity.</td></tr>
+<tr><td>5</td><td>Can the server link a vote to a voter?</td><td>The database has no link: the token table has no voter column or timestamp. But in the demo page the server sees both in one request, so a dishonest server could. The full app encrypts in the browser, and zero-knowledge proofs would fix it fully.</td></tr>
+<tr><td>6</td><td>Why RSA and AES together?</td><td>RSA can only encrypt small data. AES-256-GCM encrypts the vote quickly and detects tampering, and RSA-3072 protects the AES key.</td></tr>
+<tr><td>7</td><td>Who can decrypt, and when?</td><td>Any 2 of 3 trustees, together, and only after the election closes. The key is split with Shamir secret sharing, and one share alone reveals nothing.</td></tr>
+<tr><td>8</td><td>Can the administrator cheat?</td><td>The administrator only opens the election. They cannot read votes, cannot close it early, and cannot change a ballot. The contract does not give that role access.</td></tr>
+<tr><td>9</td><td>What if the cloud server is hacked?</td><td>It holds only the public key and the backend's submitter key. The attacker cannot decrypt votes or change the rules. They could stop voting (denial of service) or see votes in the demo mode.</td></tr>
+<tr><td>10</td><td>Why is a vote slower on Sepolia?</td><td>It waits for a real block (7 to 14 seconds). The local chain mines instantly (0.23 s total).</td></tr>
+<tr><td>11</td><td>Why is the gas different (417,000 vs 1.81 million)?</td><td>We measured both and do not know the cause yet. One possibility is that Sepolia prices new storage differently from my local chain. It is future work to find out and reduce it.</td></tr>
+<tr><td>12</td><td>What did it cost?</td><td>Nothing: Sepolia test ether is free and the cloud server is on a free tier. On a real network the cost would be gas used times gas price, so it must be measured again.</td></tr>
+<tr><td>13</td><td>Is this ready for a real election?</td><td>No. It is a prototype. It needs a real identity check, browser-side encryption, several independent submitters, and an independent security audit.</td></tr>
+<tr><td>14</td><td>Where is the ECE content?</td><td>Cryptography (RSA, AES, hashing, secret sharing), networking (HTTPS, cloud, blockchain network), and secure system design. The hardware is the laptop and the cloud server.</td></tr>
+<tr><td>15</td><td>How did you test it?</td><td>107 automated tests (20 for the contract, 75 for the backend and cryptography, 12 for deployment), a local election, and a live election on Sepolia with a public recount.</td></tr>
+<tr><td>16</td><td>What about people forced to vote a certain way?</td><td>An online system cannot prevent coercion away from a polling booth. It is a known limit, listed in the report.</td></tr>
+<tr><td>17</td><td>What was the hardest problem?</td><td>Two bugs: quick transactions reusing the same number (fixed by turning off the library's cache), and the local chain's clock lagging behind real time (fixed by mining a block first).</td></tr>
+<tr><td>18</td><td>Why did you use Aadhaar OTP before, and not now?</td><td>The first design simulated an Aadhaar OTP. For the demo we focused on the backend, encryption and blockchain parts. A real identity step is the next layer.</td></tr>
+</table>
+
+<h2>If something goes wrong during the demo</h2>
+<table>
+<tr><th style="width:36%">Problem</th><th>What to do</th></tr>
+<tr><td>Page says &ldquo;Voting is not open&rdquo;</td><td>Wait until the start time has passed (60 seconds after you ran open), and refresh.</td></tr>
+<tr><td>A vote takes very long</td><td>Say that it is waiting for a real block. If it fails, show slides 13 and 14 as the evidence from the first run.</td></tr>
+<tr><td><code>close</code> says &ldquo;execution reverted&rdquo;</td><td>The window has not ended yet (or it is already closed). Wait for the end time and try again.</td></tr>
+<tr><td>Website does not load</td><td>Show the Etherscan pages and the slides. The contract is on the blockchain whether or not the web server is up.</td></tr>
+</table>
+
+</body></html>

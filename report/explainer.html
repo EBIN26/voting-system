@@ -1,0 +1,203 @@
+<html><head><meta charset="utf-8">
+<style>
+body { font-family: Calibri, Arial, sans-serif; font-size: 11.5pt; color: #111; line-height: 1.25; }
+h1 { font-size: 24pt; color: #156082; margin: 0 0 2pt 0; }
+h2 { font-size: 15pt; color: #156082; margin: 14pt 0 4pt 0; border-bottom: 1px solid #156082; }
+h3 { font-size: 12pt; margin: 8pt 0 2pt 0; color: #1f1f1f; }
+p, li { margin: 3pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0; }
+td, th { border: 1px solid #888; padding: 3pt 5pt; vertical-align: top; font-size: 10.5pt; }
+th { background: #e6e6e6; text-align: left; }
+code { font-family: Consolas, monospace; font-size: 9.5pt; background: #f0f0f0; }
+.box { background: #eef4f8; border: 1px solid #156082; padding: 5pt 8pt; }
+.warn { background: #fff4d6; border: 1px solid #d8b24a; padding: 5pt 8pt; }
+.center { text-align: center; }
+.small { font-size: 9.5pt; color: #444; }
+</style></head><body>
+
+<h1>Our project explained</h1>
+<p><b>Secure blockchain-based voting system</b><br>
+By M. Ebin Virjo and K. Kirithika, ECE, VISTAS. This guide is for reading on your own, before the review or whenever you need it. No technical background in blockchain is assumed.</p>
+
+<div class="box"><b>The whole project in one paragraph.</b> A voter presses one button. Our server checks that the person is allowed to vote and has not voted yet, seals their vote inside an encrypted ballot that looks like random data, and writes that sealed ballot onto a public blockchain through a program called a smart contract. Nobody can open the ballots during the election. After it closes, two of three trustees combine their pieces of the secret key, open the ballots and count them. The key is then published, so anyone can open the ballots too and check that the count is honest.</div>
+
+<h2>1. The idea in everyday words</h2>
+<p>Imagine a <b>glass ballot box in a public square</b>, with a notebook next to it that everyone can read but nobody can erase.</p>
+<ul>
+<li>Each voter puts in an <b>envelope that is locked</b>, so nobody can see the vote inside.</li>
+<li>The notebook (the <b>blockchain</b>) records every envelope, in order, for ever. Nobody can remove or change an entry.</li>
+<li>A <b>rule book</b> (the <b>smart contract</b>) stands guard: one envelope per voter, only during the voting hours, no more envelopes than voters.</li>
+<li>The key to the envelopes is <b>cut into three pieces</b> and given to three trustees. Any two pieces together open the envelopes, but only after voting ends.</li>
+<li>Afterwards the key is published, so <b>anyone can open the envelopes and recount</b>.</li>
+</ul>
+<p>That is exactly what our system does, with computers instead of paper.</p>
+
+<h2>2. The problem we are solving</h2>
+<p>A good voting system has to do things that pull in opposite directions:</p>
+<table>
+<tr><th style="width:38%">We need</th><th>But that is hard because</th></tr>
+<tr><td>Only eligible people vote, and only once</td><td>We must know who voted, yet…</td></tr>
+<tr><td>Nobody can find out how someone voted</td><td>…the record of who voted must not link to their choice.</td></tr>
+<tr><td>Nobody can change the result</td><td>The people running the system could be dishonest.</td></tr>
+<tr><td>Anyone can check the result</td><td>Yet the votes must stay secret until the end.</td></tr>
+</table>
+<p>Our design splits the trust: the server knows <i>who</i> voted but not <i>what</i> they chose; the blockchain holds the sealed ballots but not the identities; the trustees can open the ballots but only together and only at the end.</p>
+
+<br style="page-break-before:always"><h2>3. The cast of characters</h2>
+<table>
+<tr><th style="width:22%">Who or what</th><th>What it does</th><th style="width:30%">What it can NOT do</th></tr>
+<tr><td><b>Voter</b></td><td>Opens the voting page and presses a candidate's Vote button.</td><td>Vote twice.</td></tr>
+<tr><td><b>Backend server</b> (on the cloud)</td><td>Checks the voter, issues a one-time token, encrypts the ballot, sends it to the blockchain.</td><td>Open sealed ballots later; change the rules.</td></tr>
+<tr><td><b>Smart contract</b> (on the blockchain)</td><td>Enforces the rules and stores the sealed ballots.</td><td>Read a vote; know who a voter is.</td></tr>
+<tr><td><b>Administrator</b></td><td>Opens the election from their own wallet.</td><td>Read votes; close early; change a ballot.</td></tr>
+<tr><td><b>Three trustees</b></td><td>Each holds one piece of the secret key. Two together decrypt and count.</td><td>Decrypt alone, or before the election closes.</td></tr>
+<tr><td><b>The public</b></td><td>Reads the blockchain, recounts with the published key.</td><td>Change anything.</td></tr>
+</table>
+
+<p class="center"><img src="file:///D:/claude/test-voting/report/img/fig31_architecture_cloud.png" width="620"></p>
+<p class="small center">Figure 1. The whole system. The dashed box is the cloud server. Administrator, trustees and public stay outside it.</p>
+
+<br style="page-break-before:always"><h2>4. What happens when you press Vote (the five steps)</h2>
+<p>Everything below runs automatically, in about a quarter of a second on our laptop (7 to 14 seconds on the real Sepolia network, because it waits for a real block).</p>
+<p class="center"><img src="file:///D:/claude/test-voting/report/img/fig32b_pipeline.png" width="640"></p>
+<p class="small center">Figure 2. The five backend steps. Each step can refuse the vote and stop.</p>
+
+<h3>Step 1. Check the request</h3>
+<p>Is the voter ID the right format? Is the candidate real? Does the blockchain say voting is open? If not, the vote is refused.</p>
+
+<h3>Step 2. Verify the voter (the &ldquo;voter hash&rdquo;)</h3>
+<p>We never store a real identity. We run the ID through a one-way scrambling function (HMAC-SHA-256, then <b>Keccak-256</b>) and get a long code, the <b>voter hash</b>. Scrambling is one-way: you can turn an ID into a hash, but not a hash back into an ID. The electoral roll holds only these hashes. If the voter's hash is on the roll, they are allowed to vote.</p>
+
+<h3>Step 3. Issue a one-time token</h3>
+<p>We make a random 32-byte token and store only <i>its</i> hash. The token table has <b>no voter column and no time stamp</b>, so even someone who reads the whole database cannot tell which token belongs to which voter. The voter is marked &ldquo;already voted&rdquo;, so pressing Vote again is refused here.</p>
+
+<h3>Step 4. Encrypt the ballot</h3>
+<p>The ballot (candidate number plus 16 random bytes) is locked in two layers. <b>AES-256-GCM</b> locks the vote fast and also notices any tampering. Then the AES key itself is locked with the election's <b>RSA-3072 public key</b>. Think of it as a fast padlock for the vote and a very strong lockbox for that padlock's key. The result is always <b>exactly 430 bytes</b>, whoever you vote for, so the size gives nothing away. The 16 random bytes make two votes for the same candidate look completely different.</p>
+<p class="center"><img src="file:///D:/claude/test-voting/report/img/fig34_ballot.png" width="560"></p>
+<p class="small center">Figure 3. Inside the 430-byte ballot.</p>
+
+<h3>Step 5. Record on the blockchain</h3>
+<p>The server sends the sealed ballot and the token's hash to the <b>smart contract</b>. The contract checks its own rules: right time window, token not used before, ballot not too big, not more ballots than voters. If everything is fine, it stores the ballot permanently and the voter gets a receipt (transaction hash and block number). If a rule fails, the contract refuses and the server releases the token so the voter can try again.</p>
+
+<div class="warn"><b>Honest note about the demo page.</b> In this one-button page the <b>server does the encryption</b>, so it briefly sees who voted for whom. Our full voter app encrypts in the voter's own browser instead. We chose the simpler version for the demonstration, and the report says so clearly.</div>
+
+<h2>5. The election from start to finish</h2>
+<p class="center"><img src="file:///D:/claude/test-voting/report/img/fig33_lifecycle.png" width="640"></p>
+<p class="small center">Figure 4. The four phases. They only move forward.</p>
+<table>
+<tr><th style="width:20%">Phase</th><th>What happens</th></tr>
+<tr><td><b>Setup</b></td><td>The <b>key ceremony</b> makes the election key and splits the private part into three trustee pieces (Shamir secret sharing: any 2 of 3 rebuild it, 1 piece alone is useless). The contract is deployed with the candidates, the trustees and the key's hash.</td></tr>
+<tr><td><b>Voting</b></td><td>The administrator opens the election with a time window (for example 5 minutes). Voters press Vote. The contract accepts ballots only inside the window.</td></tr>
+<tr><td><b>Closed</b></td><td>After the end time <i>anyone</i> can close the election. Nobody, not even the administrator, can close it early. Two trustees rebuild the key, decrypt the ballots and count. Ballots that cannot be decrypted count as invalid and never stop the count.</td></tr>
+<tr><td><b>Finalized</b></td><td>Each of the two trustees submits the count from their own wallet. When two identical counts arrive, the contract locks in the result. The key is published, and anyone can run the recount tool to check.</td></tr>
+</table>
+
+<br style="page-break-before:always"><h2>6. The cloud part</h2>
+<p>To show the system working like a real website, the backend runs on a <b>free Oracle Cloud server</b> and the contract is on the <b>Sepolia</b> public test blockchain. Sepolia uses fake money (test ether), so nothing costs anything.</p>
+<table>
+<tr><th style="width:24%">Piece</th><th>What it is for</th></tr>
+<tr><td>Oracle Cloud VM</td><td>A small Linux computer (Ubuntu 24.04, 1 GB memory) that is always on and has a public address.</td></tr>
+<tr><td>Docker</td><td>Packs our backend and everything it needs into one container, so it runs the same everywhere.</td></tr>
+<tr><td>Caddy</td><td>Sits in front of the backend and gets a free HTTPS certificate automatically (the padlock in the browser).</td></tr>
+<tr><td>DuckDNS</td><td>A free name (<code>e-voting-system.duckdns.org</code>) that points to the server's address.</td></tr>
+<tr><td>Sepolia</td><td>A public Ethereum test network. Anyone can look up our contract on Etherscan.</td></tr>
+<tr><td>Etherscan</td><td>A website that shows every transaction on the blockchain, which proves the election really ran there.</td></tr>
+</table>
+<p><b>What stays OFF the server:</b> the administrator's wallet key, the trustees' key pieces and the private election key. The server holds only the public key and its own &ldquo;submitter&rdquo; key (which can only submit ballots). So even a stolen server cannot read votes or change the rules.</p>
+
+<h2>7. What we measured and proved</h2>
+<table>
+<tr><th style="width:36%">Result</th><th>Value</th></tr>
+<tr><td>Automated tests</td><td><b>107 pass</b> (20 contract, 75 backend and cryptography, 12 deployment).</td></tr>
+<tr><td>Time per vote, local test chain</td><td>about <b>0.23 s</b> (blockchain step is three quarters of it).</td></tr>
+<tr><td>Time per vote on Sepolia</td><td><b>7 to 14 s</b> for the blockchain step (a real block).</td></tr>
+<tr><td>Ballot size</td><td><b>430 bytes</b>, always.</td></tr>
+<tr><td>Gas per ballot</td><td>about <b>417,000</b> on the local chain, about <b>1.81 million</b> on Sepolia. <i>We do not yet know why they differ.</i></td></tr>
+<tr><td>Live election on Sepolia</td><td>4 voters, 4 ballots in 4 blocks, a repeat vote and an off-roll voter refused, two trustees agreed, result finalized: <b>Ann 2, Ben 1, Cat 1</b>, and the public recount matched.</td></tr>
+</table>
+<p class="center"><img src="file:///D:/claude/test-voting/report/img/live/live-2-vote-ok.png" width="330">&nbsp;&nbsp;<img src="file:///D:/claude/test-voting/report/img/live/live-4-refused-roll.png" width="310"></p>
+<p class="small center">Figure 5. Left: a vote recorded on the live site. Right: a voter who is not on the roll is refused at step 2.</p>
+
+<h2>8. What is NOT done (be honest about this)</h2>
+<div class="warn">
+<ul>
+<li>The demo uses <b>dummy voter IDs</b>. There is no real identity check (such as an OTP) in the demo.</li>
+<li>In the demo page the <b>server encrypts the ballot</b>, so it sees the voter and the choice together.</li>
+<li>One backend submits all ballots. It cannot read or change them, but it could refuse to submit.</li>
+<li>The <b>trustee passphrases are public</b> in the demo, so the key pieces protect nothing in this run.</li>
+<li>The higher gas on Sepolia is <b>unexplained</b>.</li>
+<li>No independent security audit. It is a prototype, not ready for a real election.</li>
+</ul>
+</div>
+
+<h2>9. Where things are on the computer</h2>
+<p>Everything is under <code>D:\claude\test-voting\</code>.</p>
+<table>
+<tr><th style="width:32%">Folder</th><th>What it is</th></tr>
+<tr><td><code>gov-evoting</code></td><td>The main completed project (local version).</td></tr>
+<tr><td><code>gov-evoting-live</code></td><td>A copy with the Sepolia and cloud work. The live demo comes from here.</td></tr>
+<tr><td><code>secure-anon-voting</code></td><td>An experiment with zero-knowledge proofs. It is our &ldquo;future work&rdquo;.</td></tr>
+<tr><td><code>voting-blockchain-backend</code></td><td>Ebin's earlier project (reviewed only).</td></tr>
+<tr><td><code>report</code></td><td>The Word report, figures, the cue card and this guide.</td></tr>
+<tr><td><code>ppt-review</code></td><td>The presentation files.</td></tr>
+</table>
+<p>Inside the project, the important parts are: <code>contracts/</code> (the smart contract), <code>backend/</code> (the server code, including <code>simple.js</code> which runs the five steps), <code>lib/</code> (the encryption), <code>scripts/</code> (key ceremony, admin commands, tally, verify), and the two test folders.</p>
+
+<div class="warn"><b>Never share or copy:</b> <code>live\wallets.json</code>, any <code>trustee-N.share.json</code>, <code>live\server.env</code>, the SSH key file, or the DuckDNS token. They are the keys to the demo wallets and the server.</div>
+
+<h2>10. How to run it yourself</h2>
+<h3>Quick local demo (no cloud, no internet needed)</h3>
+<p>Open PowerShell and go to the project folder, then run one command. It starts a local test blockchain, makes the key, deploys the contract, opens the election and starts the voting page:</p>
+<p><code>cd D:\claude\test-voting\gov-evoting-live</code></p>
+<p><code>npm run demo:simple</code></p>
+<p>Open the address it prints in your browser and press a Vote button. Stop it with Ctrl+C. (If it says a port is busy, an earlier demo is still running. Close it first.)</p>
+<h3>The live cloud version</h3>
+<p>Open <code>https://e-voting-system.duckdns.org/simple.html</code>. The election has to be opened from Ebin's computer first with <code>node scripts/admin.js --live open 4 60 300</code>, which needs the wallet files that stay on that computer. The cue card has the full sequence.</p>
+
+<br style="page-break-before:always"><h2>11. Glossary: words you will hear</h2>
+<table>
+<tr><th style="width:24%">Term</th><th>Plain meaning</th></tr>
+<tr><td>Blockchain</td><td>A shared record kept by many computers. New entries are added, never removed or edited.</td></tr>
+<tr><td>Smart contract</td><td>A program stored on the blockchain that runs exactly as written. Ours enforces the election rules.</td></tr>
+<tr><td>Ethereum / Sepolia</td><td>A blockchain that supports smart contracts / its free public test version.</td></tr>
+<tr><td>Wallet</td><td>An account on the blockchain, controlled by a secret key.</td></tr>
+<tr><td>Gas</td><td>The fee unit for running things on the blockchain. More work or storage means more gas.</td></tr>
+<tr><td>Transaction / block</td><td>One action written to the chain / a batch of transactions added together.</td></tr>
+<tr><td>Hash</td><td>A one-way scramble that turns any data into a fixed-size code. You cannot reverse it.</td></tr>
+<tr><td>Keccak-256</td><td>The hash function Ethereum uses (the original design behind SHA-3).</td></tr>
+<tr><td>HMAC</td><td>A hash mixed with a secret, so nobody can guess inputs by trying them all.</td></tr>
+<tr><td>AES-256-GCM</td><td>Fast encryption that also detects any change to the data.</td></tr>
+<tr><td>RSA-OAEP</td><td>Public-key encryption: anyone can lock with the public key, only the private key unlocks.</td></tr>
+<tr><td>Hybrid encryption</td><td>Using AES for the data and RSA to protect the AES key. Fast and strong.</td></tr>
+<tr><td>Shamir secret sharing</td><td>Splitting a secret into pieces so that a minimum number (here 2 of 3) rebuild it.</td></tr>
+<tr><td>Trustee</td><td>A person who holds one piece of the key.</td></tr>
+<tr><td>Token</td><td>A random one-time code that lets one voter cast one ballot.</td></tr>
+<tr><td>Electoral roll</td><td>The list of who may vote (ours holds only hashes).</td></tr>
+<tr><td>Docker / Caddy</td><td>Software that packs our server for the cloud / adds HTTPS in front of it.</td></tr>
+<tr><td>Etherscan</td><td>A public website that shows everything on the blockchain.</td></tr>
+</table>
+
+<h2>12. Questions you should be able to answer</h2>
+<ol>
+<li><b>Why a blockchain?</b> So nobody alone can change the rules or the ballots, and the public can check them.</li>
+<li><b>How is the vote secret on a public chain?</b> Only encrypted 430-byte ballots go on it.</li>
+<li><b>How is double voting stopped?</b> One token per voter, checked in the database and again by the contract.</li>
+<li><b>Who can open the ballots?</b> Any two of three trustees together, only after the election closes.</li>
+<li><b>Can the administrator cheat?</b> No. They only open the election, and cannot read, change or close early.</li>
+<li><b>What if the cloud server is hacked?</b> It holds only the public key, so votes stay sealed and the rules stay fixed.</li>
+<li><b>What is simulated?</b> The voter IDs are dummy. Real identity checking is future work.</li>
+<li><b>Why is Sepolia slower than local?</b> It waits for a real block (7 to 14 s).</li>
+<li><b>Why is the gas different?</b> We measured both and have not found the cause yet.</li>
+<li><b>Is it ready for a real election?</b> No. It is a prototype with no audit.</li>
+</ol>
+
+<h2>13. What to read, in this order</h2>
+<ol>
+<li>This guide (15 minutes).</li>
+<li>The slides: <code>ppt-review\Mini Project - Demo version.pptx</code> (10 minutes).</li>
+<li>The report, chapter 3 (how it works) and chapter 5 (results): <code>report\Mini Project Report - Demo version.docx</code>.</li>
+<li>The cue card for the review day: <code>report\Review cue card.docx</code>.</li>
+</ol>
+<p class="small">Tip: if you only have five minutes, read the box on page 1, section 4 and section 8.</p>
+
+</body></html>

@@ -1,0 +1,28 @@
+[
+  {"t": "refs", "items": [
+    "[1]\tS. Nakamoto, \"Bitcoin: A Peer-to-Peer Electronic Cash System,\" 2008.",
+    "[2]\tV. Buterin, \"A Next-Generation Smart Contract and Decentralized Application Platform (Ethereum White Paper),\" 2014.",
+    "[3]\tG. Wood, \"Ethereum: A Secure Decentralised Generalised Transaction Ledger (Yellow Paper),\" Ethereum Project.",
+    "[4]\tM. Swan, Blockchain: Blueprint for a New Economy. Sebastopol, CA, USA: O'Reilly Media, 2015.",
+    "[5]\tA. M. Antonopoulos and G. Wood, Mastering Ethereum: Building Smart Contracts and DApps. Sebastopol, CA, USA: O'Reilly Media, 2018.",
+    "[6]\tK. Christidis and M. Devetsikiotis, \"Blockchains and smart contracts for the Internet of Things,\" IEEE Access, vol. 4, pp. 2292-2303, 2016.",
+    "[7]\tR. L. Rivest, A. Shamir, and L. Adleman, \"A method for obtaining digital signatures and public-key cryptosystems,\" Commun. ACM, vol. 21, no. 2, pp. 120-126, 1978.",
+    "[8]\tA. Shamir, \"How to share a secret,\" Commun. ACM, vol. 22, no. 11, pp. 612-613, 1979.",
+    "[9]\tM. Dworkin, \"Recommendation for Block Cipher Modes of Operation: Galois/Counter Mode (GCM) and GMAC,\" NIST Special Publication 800-38D, 2007.",
+    "[10]\tK. Moriarty, B. Kaliski, J. Jonsson, and A. Rusch, \"PKCS #1: RSA Cryptography Specifications Version 2.2,\" RFC 8017, IETF, 2016.",
+    "[11]\tH. Krawczyk, M. Bellare, and R. Canetti, \"HMAC: Keyed-Hashing for Message Authentication,\" RFC 2104, IETF, 1997.",
+    "[12]\tD. L. Chaum, \"Untraceable electronic mail, return addresses, and digital pseudonyms,\" Commun. ACM, vol. 24, no. 2, pp. 84-90, 1981.",
+    "[13]\tF. P. Hjalmarsson, G. K. Hreioarsson, M. Hamdaqa, and G. Hjalmtysson, \"Blockchain-based e-voting system,\" in Proc. IEEE 11th Int. Conf. Cloud Computing (CLOUD), 2018, pp. 983-986.",
+    "[14]\tN. Kshetri and J. Voas, \"Blockchain-enabled e-voting,\" IEEE Software, vol. 35, no. 4, pp. 95-99, 2018.",
+    "[15]\tB. Adida, \"Helios: Web-based open-audit voting,\" in Proc. 17th USENIX Security Symposium, 2008, pp. 335-348.",
+    "[16]\tP. McCorry, S. F. Shahandashti, and F. Hao, \"A smart contract for boardroom voting with maximum voter privacy,\" in Financial Cryptography and Data Security (FC 2017), Springer, 2017, pp. 357-375.",
+    "[17]\tS. Park, M. Specter, N. Narula, and R. L. Rivest, \"Going from bad to worse: from Internet voting to blockchain voting,\" J. Cybersecurity, vol. 7, no. 1, 2021.",
+    "[18]\tNational Institute of Standards and Technology, \"Secure Hash Standard (SHS),\" FIPS PUB 180-4, 2015.",
+    "[19]\tGovernment of India, \"The Aadhaar (Targeted Delivery of Financial and Other Subsidies, Benefits and Services) Act, 2016.\"",
+    "[20]\tNational Institute of Standards and Technology, \"SHA-3 Standard: Permutation-Based Hash and Extendable-Output Functions,\" FIPS PUB 202, 2015.",
+    "[21]\tGovernment of India, \"The Digital Personal Data Protection Act, 2023.\"",
+    "[22]\tUnited Nations, \"Transforming our world: the 2030 Agenda for Sustainable Development,\" Resolution A/RES/70/1, 2015.",
+    "[23]\tOWASP Foundation, \"OWASP Top 10 Web Application Security Risks.\" [Online]. Available: https://owasp.org/www-project-top-ten/",
+    "[24]\tW3C, \"Content Security Policy Level 3,\" W3C Working Draft. [Online]. Available: https://www.w3.org/TR/CSP3/"
+  ]}
+]

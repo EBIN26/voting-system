@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title>Election Administration</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top wide">
+  <svg class="logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1.2 14.2-3.5-3.5 1.4-1.4 2.1 2.1 4.6-4.6 1.4 1.4-6 6Z"/>
+  </svg>
+  <div>
+    <h1 id="title">Election Administration</h1>
+    <p class="muted">Open the election, monitor turnout and publish results</p>
+  </div>
+</header>
+
+<main id="main" class="wide">
+  <section class="card" aria-labelledby="statusHeading">
+    <h2 id="statusHeading" class="sr-only">Election status</h2>
+    <div class="status-row">
+      <span class="chip" id="phaseChip">Loading…</span>
+      <span id="timeLeft" class="muted"></span>
+    </div>
+    <p id="phaseText" class="phase-text"></p>
+  </section>
+
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+  <!-- Access -->
+  <section class="card" aria-labelledby="accessHeading">
+    <h2 id="accessHeading">Administrator access</h2>
+    <p class="help">Needed to see registration and token counts. It is kept in this page's memory only and is forgotten when you close or lock the page.</p>
+    <form id="unlockForm" autocomplete="off">
+      <label for="adminKey">Admin API key</label>
+      <input id="adminKey" type="password" autocomplete="off" spellcheck="false">
+      <div class="actions">
+        <button type="submit" id="unlockBtn" class="primary">Unlock monitoring</button>
+        <button type="button" id="lockBtn" class="secondary" hidden>Lock</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Turnout -->
+  <section class="card" aria-labelledby="turnoutHeading">
+    <h2 id="turnoutHeading">Turnout</h2>
+    <p class="turnout"><span id="turnoutPct">0%</span> <span class="muted" id="turnoutText"></span></p>
+    <div class="bar" role="img" id="turnoutBarWrap" aria-label="Turnout"><div id="turnoutBar"></div></div>
+    <table class="funnel">
+      <caption class="sr-only">Voters at each stage</caption>
+      <thead><tr><th scope="col">Stage</th><th scope="col" class="num">Count</th><th scope="col">Source</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Electoral roll</th><td class="num" id="cRoll">-</td><td class="muted">database</td></tr>
+        <tr><th scope="row">Registered voters</th><td class="num" id="cRegistered">-</td><td class="muted">database</td></tr>
+        <tr><th scope="row">Voting tokens issued</th><td class="num" id="cIssued">-</td><td class="muted">database</td></tr>
+        <tr><th scope="row">Ballots recorded</th><td class="num" id="cBallots">-</td><td class="muted">blockchain</td></tr>
+        <tr><th scope="row">Eligible voters (limit)</th><td class="num" id="cEligible">-</td><td class="muted">blockchain</td></tr>
+      </tbody>
+    </table>
+    <ul class="checks" id="consistency" aria-label="Consistency checks"></ul>
+    <p class="help">These are counts only. Nothing here shows who voted or how.</p>
+  </section>
+
+  <!-- Open the election -->
+  <section class="card" id="openCard" aria-labelledby="openHeading" hidden>
+    <h2 id="openHeading">Open the election</h2>
+    <p>Opening fixes the voting window and the number of eligible voters on the blockchain. It cannot be undone. You sign it with the administrator wallet; the server never holds that key.</p>
+
+    <h3>Before you open</h3>
+    <ul class="checks" id="openChecks"></ul>
+
+    <div class="actions">
+      <button type="button" id="connectBtn" class="secondary">Connect administrator wallet</button>
+    </div>
+    <p class="muted" id="walletInfo"></p>
+
+    <form id="openForm" autocomplete="off">
+      <div class="grid">
+        <div>
+          <label for="eligible">Eligible voters</label>
+          <input id="eligible" inputmode="numeric" required>
+          <p class="help" id="eligibleHelp">Must equal the size of the electoral roll.</p>
+        </div>
+        <div>
+          <label for="startAt">Voting opens</label>
+          <input id="startAt" type="datetime-local" required>
+        </div>
+        <div>
+          <label for="hours">Voting stays open (hours)</label>
+          <input id="hours" inputmode="decimal" required>
+        </div>
+      </div>
+      <p class="summary" id="openSummary"></p>
+      <div class="actions">
+        <button type="submit" id="reviewBtn" class="primary">Review</button>
+      </div>
+    </form>
+
+    <div id="confirmOpen" class="confirm" hidden>
+      <p><strong>Please confirm.</strong> Your wallet will ask you to sign. This is final.</p>
+      <div class="actions">
+        <button type="button" id="signBtn" class="primary">Sign and open the election</button>
+        <button type="button" id="cancelOpen" class="secondary">Go back</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Schedule / closing -->
+  <section class="card" id="scheduleCard" aria-labelledby="scheduleHeading" hidden>
+    <h2 id="scheduleHeading">Voting schedule</h2>
+    <dl class="facts">
+      <div><dt>Opens</dt><dd id="schedStart">-</dd></div>
+      <div><dt>Closes</dt><dd id="schedEnd">-</dd></div>
+    </dl>
+    <div id="closeBox" hidden>
+      <p>The voting period is over. Close the election so the trustees can count the votes.</p>
+      <div class="actions"><button type="button" id="closeBtn" class="primary">Close the election</button></div>
+    </div>
+    <p class="help">The contract does not let anyone, including the administrator, close the election before the end time.</p>
+  </section>
+
+  <!-- Counting -->
+  <section class="card" id="countCard" aria-labelledby="countHeading" hidden>
+    <h2 id="countHeading">Counting</h2>
+    <p>The votes are encrypted. The result becomes final only when <strong id="thresholdText">2</strong> trustees each decrypt the votes and submit the same totals.</p>
+    <p class="turnout"><span id="agreePct">0</span> <span class="muted" id="agreeText"></span></p>
+    <table class="funnel">
+      <caption class="sr-only">Trustee submissions</caption>
+      <thead><tr><th scope="col">Trustee wallet</th><th scope="col">Tally submitted</th></tr></thead>
+      <tbody id="trusteeRows"></tbody>
+    </table>
+    <details class="backup">
+      <summary>Instructions for the trustees</summary>
+      <ol class="how">
+        <li>At least the required number of trustees meet on an offline computer with their key share files.</li>
+        <li>Run <code>node scripts/tally.js --shares trustee-1.share.json,trustee-2.share.json</code> and type your passphrases.</li>
+        <li>Each trustee submits the result from their own wallet with <code>node scripts/submit-tally.js</code>.</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- Results -->
+  <section class="card" id="resultsCard" aria-labelledby="resultsHeading" hidden>
+    <h2 id="resultsHeading">Final results</h2>
+    <div id="results"></div>
+    <p class="help" id="resultsNote"></p>
+    <details class="backup">
+      <summary>How anyone can verify these results</summary>
+      <p>The trustees can publish the election private key. Anyone then runs <code>node scripts/verify-tally.js --key published-election-private-key.pem</code> to re-count the ballots on the blockchain and compare with this result.</p>
+    </details>
+  </section>
+
+  <!-- Audit -->
+  <section class="card" aria-labelledby="auditHeading">
+    <h2 id="auditHeading">Election details</h2>
+    <dl class="facts" id="audit"></dl>
+  </section>
+</main>
+
+<script src="admin.js"></script>
+</body>
+</html>

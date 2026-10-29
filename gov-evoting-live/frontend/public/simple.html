@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<title>Vote Demo</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="simple.css">
+</head>
+<body>
+<header class="top">
+  <svg class="logo" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Zm-1.2 14.2-3.5-3.5 1.4-1.4 2.1 2.1 4.6-4.6 1.4 1.4-6 6Z"/>
+  </svg>
+  <div>
+    <h1 id="title">Vote Demo</h1>
+    <p class="muted">Press a button to vote. The backend verifies, encrypts and records it on the blockchain.</p>
+  </div>
+</header>
+
+<main>
+  <div class="banner">
+    <strong>Demo page.</strong> No login, and the server sees who voted for whom in this request. It only shows the backend, encryption and blockchain steps.
+  </div>
+
+  <section class="card">
+    <div class="status-row">
+      <span class="chip" id="phaseChip">Loading…</span>
+      <span class="muted" id="countText"></span>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="voteHeading">
+    <h2 id="voteHeading">Cast a vote</h2>
+    <label for="voter">Voter ID (dummy)</label>
+    <select id="voter"></select>
+    <p class="help">Each voter can vote once. The last ID is not on the electoral roll, so it is refused.</p>
+    <div class="candidates" id="candidates" role="group" aria-label="Candidates"></div>
+  </section>
+
+  <div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+  <section class="card" id="pipelineCard" aria-labelledby="pipelineHeading" hidden>
+    <h2 id="pipelineHeading">What the backend did</h2>
+    <ol class="pipeline" id="pipeline"></ol>
+    <div id="receipt" class="receipt" hidden>
+      <p class="label">Confirmation code (token hash on the blockchain)</p>
+      <p class="code" id="receiptCode"></p>
+      <p class="label">Blockchain transaction</p>
+      <p class="code" id="receiptTx"></p>
+    </div>
+  </section>
+</main>
+
+<script src="simple.js"></script>
+</body>
+</html>

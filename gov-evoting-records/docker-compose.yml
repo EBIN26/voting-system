@@ -1,0 +1,35 @@
+# Runs the e-voting server behind Caddy, which gets a free HTTPS certificate automatically.
+# Needs: a domain name pointing at this machine, and ports 80 and 443 open.
+# Files next to this one: server.env (settings, holds the submitter key), election-public-key.pem,
+# Caddyfile, and .env containing SITE_ADDRESS=your.domain.example
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: ./server.env
+    volumes:
+      - evoting-data:/data
+      - ./election-public-key.pem:/app/ceremony/election-public-key.pem:ro
+      - ./admin-public-key.pem:/app/records/admin-public-key.pem:ro
+    expose:
+      - "3000"
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:?Set SITE_ADDRESS in the .env file next to docker-compose.yml}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - app
+
+volumes:
+  evoting-data:
+  caddy-data:
+  caddy-config:

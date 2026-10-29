@@ -1,0 +1,42 @@
+[
+  {"t": "h1", "num": "4", "title": "HARDWARE AND SOFTWARE USED"},
+  {"t": "h2", "text": "4.1 Hardware Used"},
+  {"t": "p", "text": "The project is a software system and needs no special electronic hardware. The prototype was developed and tested on an ordinary laptop. The server for the cloud deployment is a small virtual machine."},
+  {"t": "table", "caption": "Table 4.1: Hardware used", "widths": [4.6, 11.0], "header": ["Item", "Details"], "boldFirstCol": true, "rows": [
+    ["Development computer", "Laptop with the Windows 11 operating system"],
+    ["Voter device", "Any computer or phone with a current web browser (Chrome was used for testing)"],
+    ["Test blockchain", "Hardhat local Ethereum node running on the development laptop"],
+    ["Cloud server", "Oracle Cloud free-tier virtual machine (x86-64, 1 GB of memory, 44 GB disk) running Ubuntu 24.04 and Docker, with ports 80 and 443 open and 2 GB of swap space added"],
+    ["Trustee computers", "Three separate computers or accounts, each holding one encrypted key share"]
+  ]},
+  {"t": "h2", "text": "4.2 Software Used"},
+  {"t": "table", "caption": "Table 4.2: Software used", "widths": [4.6, 3.0, 8.0], "header": ["Software", "Version", "Purpose"], "boldFirstCol": true, "rows": [
+    ["Node.js", "24", "Runtime for the backend, scripts and tests"],
+    ["Express", "5.x", "Web server and API"],
+    ["SQLite (node:sqlite)", "built in", "Database for the roll and token hashes"],
+    ["Solidity", "0.8.28", "Smart contract language (EVM target: Cancun)"],
+    ["Hardhat", "2.x", "Compiling, testing and local blockchain"],
+    ["ethers", "6.x", "Talking to the blockchain from the backend and tools"],
+    ["Web Crypto and Node crypto", "built in", "AES-GCM, RSA-OAEP and HMAC"],
+    ["shamir-secret-sharing", "library", "Splitting and rebuilding the election key"],
+    ["esbuild", "library", "Bundling the browser code"],
+    ["helmet", "library", "Security headers and the content security policy"],
+    ["Docker", "Compose", "Container image and the two-container setup"],
+    ["Caddy", "2", "Reverse proxy with automatic HTTPS"],
+    ["Oracle Cloud", "free tier", "Virtual machine to host the server"],
+    ["DuckDNS", "free", "Free public domain name for the server"],
+    ["Sepolia", "test network", "Public Proof-of-Stake Ethereum test network (chain id 11155111), viewed through Etherscan"],
+    ["Microsoft Word and PowerPoint", "-", "Report and presentation"]
+  ]},
+  {"t": "h2", "text": "4.3 Modelling and Development"},
+  {"t": "p", "text": "The system was developed in stages, and each stage was tested before the next began: first the smart contract and its tests; then the key ceremony; then the backend with the voter hash and the token logic; then the voting and administrator pages; then the one-button demonstration page; and last the deployment tooling for Sepolia and the cloud server. The code was organised as follows."},
+  {"t": "table", "caption": "Table 4.3: Organisation of the project code", "widths": [4.6, 11.0], "header": ["Folder", "Contents"], "boldFirstCol": true, "rows": [
+    ["contracts", "GovElection smart contract"],
+    ["backend", "Express server, voter hash, token store, blockchain client, one-button mode"],
+    ["frontend and lib", "Voting and administrator pages and the ballot encryption"],
+    ["scripts", "Key ceremony, administrator commands, tally, submit-tally, verify-tally, deployment, bundle and demo launcher"],
+    ["Dockerfile, docker-compose.yml, Caddyfile", "Container image, two-container setup and HTTPS proxy"],
+    ["test and backend-tests", "Contract tests, backend and cryptography tests, deployment tests"]
+  ]},
+  {"t": "p", "text": "Two practical problems found during development affected correctness. First, sending two transactions quickly one after the other made the library reuse a transaction number, so the second failed; the fix was to turn off the library's short-term cache of the account's transaction count. Second, on a fresh local chain the clock of the chain lagged behind real time, so the contract answered that voting was not yet open; the start-up script now mines a block and uses the chain's own time."}
+]

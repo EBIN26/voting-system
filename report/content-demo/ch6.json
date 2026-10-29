@@ -1,0 +1,27 @@
+[
+  {"t": "h1", "num": "6", "title": "CONCLUSION AND FUTURE WORK"},
+  {"t": "h2", "text": "6.1 Conclusion"},
+  {"t": "p", "text": "This project designed, built and demonstrated a blockchain voting system in which one button press starts a complete, secure backend process. In about a quarter of a second the backend checks the election, verifies the voter by a hash, issues a one-time token with no link to the voter, encrypts the ballot into a fixed 430 bytes and records it on a blockchain through a smart contract. The contract, not the web server, enforces the voting window, the voter limit and one ballot per token. The decryption key is split among three trustees, any two of whom can count, and anyone can recount from the published key."},
+  {"t": "p", "text": "The prototype passed 107 automated tests and completed full demonstration elections with the correct result, refusing a repeated vote and an off-roll voter. On the local chain a vote took about 0.23 seconds and about 417,000 gas. The system was then deployed on an Oracle Cloud server with HTTPS and on the Sepolia public test network, where a four-voter election was run: four ballots were recorded in separate blocks, two trustees submitted identical counts (Ann 2, Ben 1, Cat 1), the contract finalised the result, and a public recount confirmed it. A ballot used about 1.81 million gas on Sepolia and took 7 to 14 seconds to confirm. The results support the main claim of the report: verifiable and tamper-evident voting can be built from standard, well-reviewed cryptographic parts."},
+  {"t": "h2", "text": "6.2 Limitations"},
+  {"t": "ul", "items": [
+    "The demonstration uses dummy voter IDs and has no proof of real identity. A real election needs an identity check, such as a one-time password through an approved service.",
+    "In the one-button page the backend encrypts the ballot, so the server sees the voter and the choice in one request. The database keeps no link, but a dishonest server could.",
+    "The backend submits all ballots, so it could refuse to submit a ballot (denial of service). It cannot read or change one, but a real system needs several independent submitters.",
+    "The prototype does not protect a voter whose own device has malware, and it cannot stop coercion or vote selling away from a polling booth.",
+    "The live run used four voters on a test network. Speed, cost and behaviour under load on a main network or with many voters have not been measured, and the higher gas used on Sepolia than on the local chain has not been explained.",
+    "The demonstration keeps the election key's demo passphrases public, so the trustee shares protect nothing in this run. A real election needs private passphrases chosen by each trustee.",
+    "The system has not had an independent security audit."
+  ]},
+  {"t": "h2", "text": "6.3 Future Work"},
+  {"t": "ul", "items": [
+    "Find out why a ballot uses more gas on Sepolia than on the local chain, and reduce the cost, for example by storing less data on the chain.",
+    "Run a larger trial election with real students and measure the speed under load.",
+    "Encrypt the ballot in the voter's browser, as the full voter application of the project already does, so that the server never sees a choice.",
+    "Add a real identity check, such as a one-time password through an approved service, before the voter hash is checked.",
+    "Move to a zero-knowledge membership proof, such as the Semaphore protocol (a first version was built in this project's workspace), so that even the backend cannot link a voter to a ballot.",
+    "Allow several independent submitters and a layer-2 network to lower the cost and the delay.",
+    "Add receipts that let a voter check that the ballot was recorded unchanged, without proving how they voted.",
+    "Commission an independent security review and a usability study before any real use."
+  ]}
+]
